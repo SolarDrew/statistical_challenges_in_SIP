@@ -1,0 +1,42 @@
+\documentclass{article}
+\begin{document}
+
+\section{Introduction}
+Few studies have investigated how the temperatures of flaring active regions behave prior to the flare.
+This method tracks flaring active regions and visualises their long-term temperature distribution.
+We attempt to find signatures of flares in the temperature profiles of active regions, which might be used for flare prediction.
+This method uses SunPy, a free, open-source Python library for solar physics.
+
+\section{Method}
+This study uses a temperature map method similar to that of [1] to calculate coronal temperatures by comparing the relative brightnesses in the different AIA wavelengths.
+Active regions AR11138-AR11183 are studied.
+The location and duration of each active region is obtained from the Heliophysics Events Knowledgebase (HEK).
+Using this information, a temperature map is calculated for a 50x50 arcsec area around each active region at 2-hour intervals from two days before the active region emerges or rotates into view until two days after it has dissipated or rotated out of view.
+How the temperature distribution changes with time is then compared to when associated flares occur for each active region.
+The flares associated with these regions have also been investigated individually.
+Information for each flare was again found by querying the HEK.
+For each flare the 95th percentile temperature was calculated from one temperature map of the corresponding active region.
+This map was chosen as the latest map before the start time of the flare.
+All flares were then plotted on a scatter graph of this temperature against the peak GOES flux of the flare.
+
+\section{Results}
+Figures 1 and 2 show the mean, standard deviation, 95th percentile and maximum temperature of active regions AR11146 and AR11149 respectively, as functions of time.
+The times of the associated flares are also plotted. These regions were chosen as they are typical of the results found for other active regions, and show similar temperature profiles but different numbers of flares. In both plots, some time before a flare or group of flares occur, the maximum temperature rises significantly but the bulk temperature of the region varies relatively little.
+Figure 3 plots the peak flux for all flares associated with the studied active regions against the 95th percentile temperature for the corresponding active regions before the beginning of the flare.
+Most of these flares are grouped around log(T) $\approx$ 6.35, 6.55 and 6.7, with fewer flares associated with hotter active regions, generally.
+However, the strongest flares observed do appear to be associated with hotter active regions.
+
+\section{Discussion}
+Figures 1 and 2 show that there is no clear trend in the long-term temperature distribution before flares occur.
+This is also the case for the other active regions investigated. If any trend in temperature does occur before large flares, it may be on a shorter timescale than investigated here, and may only be noticable for very large flares.
+Any further work on this topic should therefore look at shorter timespans with higher cadence, and perhaps only consider active regions associated with X-class flares.
+From figure 3 it can be seen that there does appear to be some grouping of flaring active regions into groups of temperatures, and that a few of the larger flares are associated with active regions at higher temperatures than most of the other flares investigated.
+However, no clear correlation can be seen between peak flare flux and active region temperature.
+A much larger sample of flares is needed in order to properly determine whether or not a link exists between the two.
+
+\section{Conclusions}
+
+\bibliographystyle{plainnat}
+\bibliography{C:/Users/Drew/Dropbox/Thesis/thesis_refs,C:/Users/Drew/Documents/library}
+
+\end{document}
