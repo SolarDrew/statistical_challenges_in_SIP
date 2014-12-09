@@ -8,15 +8,19 @@ We attempt to find signatures of flares in the temperature profiles of active re
 This method uses SunPy, a free, open-source Python library for solar physics.
 
 \section{Method}
-This study uses a temperature map method similar to that of [1] to calculate coronal temperatures by comparing the relative brightnesses in the different AIA wavelengths.
-Active regions AR11138-AR11183 are studied.
-The location and duration of each active region is obtained from the Heliophysics Events Knowledgebase (HEK).
-Using this information, a temperature map is calculated for a 50x50 arcsec area around each active region at 2-hour intervals from two days before the active region emerges or rotates into view until two days after it has dissipated or rotated out of view.
+The core of this analysis is the temperature map method described by \cite{Leonard2014} (henceforth Paper I).
+Briefly, this method compares the relative brightnesses in each AIA wavelength channel at a given time and infers the best-fitting temperature from that comparison.
+This allows the temperature of the corona to be estimated for every pixel of an AIA image, resulting in very high resolution temperature maps.
+
+The method of Paper I was used to investigate the temperatures of flaring active regions betwen AR11138-AR11183. %subsitute dates here
+The Heliophysics Events Knowledgebase (HEK) was queried to find the location on the solar disk of each active region and the time of any flares associated with the regions.
+Using this information, a temperature map was calculated for a 50x50 arcsec area around each active region at 1-minute intervals for the hour preceding a flare event.
 How the temperature distribution changes with time is then compared to when associated flares occur for each active region.
-The flares associated with these regions have also been investigated individually.
-Information for each flare was again found by querying the HEK.
+The mean (and standard deviation? percentiles?) of the temperature map was calculated at each time step and these values were plotted for each flare.
+
+The overall behaviour of the active  region temperatures before flares was also investigated.
 For each flare the 95th percentile temperature was calculated from one temperature map of the corresponding active region.
-This map was chosen as the latest map before the start time of the flare.
+This map was chosen as the latest map before the start time of the flare. % was it?
 All flares were then plotted on a scatter graph of this temperature against the peak GOES flux of the flare.
 
 \section{Results}
