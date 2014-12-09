@@ -8,17 +8,18 @@ Created on Tue Dec 09 18:15:45 2014
 from matplotlib import use
 use('agg')
 from sunpy import wcs
-from sunpy.map import Map
 from sunpy.net import hek
 from sunpy.time import parse_time as parse
 from sunpy.time.timerange import TimeRange as tr
 import datetime as dt
 from repeat_tempmaps import repeat
 from os.path import join
+from sys import path
+path.append('/imaps/holly/drew/CoronaTemps/')
+from temperature import TemperatureMap as tmap
 
 start = parse('2011-02-10')
-end = parse('2011-02-16')
-#end = parse('2011-01-04')
+end = parse('2011-04-01')
 
 client = hek.HEKClient()
 flares = client.query(hek.attrs.Time(start, end),
@@ -34,15 +35,13 @@ datefile = open('dates.txt', 'w')
 datefile.write('')
 datefile.close()
 
+ar_rad = 75
+
 for flare in flares:
     flaretime = parse(flare['event_starttime'])
     starttime = flaretime-dt.timedelta(hours=0.5)
     timerange = tr(starttime, flaretime)
 
-    fits_dir = '/imaps/sspfs/archive/sdo/aia/activeregions/'.format(starttime)
-    fname = 'aia*171*{0:%Y?%m?%d}?{0:%H?%M?%S}*lev1?fits'.format(flaretime)
-    filepath = join(fits_dir, fname)
-    temp_im = Map(filepath)
     region = client.query(hek.attrs.EventType('AR'),
                           hek.attrs.Time(flaretime-dt.timedelta(minutes=5), 
                                          flaretime))
@@ -55,14 +54,29 @@ for flare in flares:
             region = region[0]
         except IndexError:
             continue
-    coords = wcs.convert_hg_hpc(region['hgc_x'], region['hgc_y'],
-                                b0_deg=temp_im.heliographic_latitude,
-                                l0_deg=temp_im.carrington_longitude)
     
-    datefile = open('dates.txt', 'a')
-    datefile.write('\nAR{}; {}\n'.format(flare['ar_noaanum'],
-                                         flare['fl_goescls']))
-    datefile.close()
     means, fluxes, maxes, times = repeat(starttime, flaretime, timeres=1.0/60.0,
                                          coords=coords, ar=flare['ar_noaanum'], 
                                          plotminmax=True)
+    # Define times for maps
+    delta = dt.timedelta(minutes=1)
+    ntimes = int(timerange.seconds()/delta.total_seconds())
+    times = [time.start() for time in timerange.split(ntimes)]
+    
+    for time in times:
+        # Load/calculate temperature map data
+        thismap = tmap(time)
+        thismap.save()
+        
+        # Crop temperature map to active region
+        x, y = wcs.convert_hg_hpc(region['hgc_x'], region['hgc_y'],
+                                  b0_deg=thismap.heliographic_latitude,
+                                  l0_deg=thismap.carrington_longitude)
+        thismap = thismap.submap([x-ar_rad, x+ar_rad], [y-ar_rad, y+ar_rad])
+        
+        # Append appropriate temperature values to list
+    
+    # Append  temperature values for final temperature map to list
+    # Plot temperature values of AR with time for that flare
+    
+# Plot instantaneous temperatures of active regions for all flares
