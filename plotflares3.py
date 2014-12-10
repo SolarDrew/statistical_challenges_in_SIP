@@ -12,7 +12,6 @@ from sunpy.net import hek
 from sunpy.time import parse_time as parse
 from sunpy.time.timerange import TimeRange as tr
 import datetime as dt
-from repeat_tempmaps import repeat
 from os.path import join
 from sys import path
 path.append('/imaps/holly/drew/CoronaTemps/')
