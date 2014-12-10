@@ -60,8 +60,8 @@ for flare in flares:
     times = [time.start() for time in timerange.split(ntimes)]
     
     home = '/imaps/sspfs/archive/sdo/aia'
-    data_dir = join(home, 'activeregions/*/data/')
-    maps_dir = join(home, 'activeregions/*/images/')
+    data_dir = join(home, 'activeregions/AR11153/data/')
+    maps_dir = join(home, 'activeregions/AR11153/images/')
     
     for time in times:
         # Load/calculate temperature map data
