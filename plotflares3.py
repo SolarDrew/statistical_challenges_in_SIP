@@ -14,7 +14,7 @@ from sunpy.time.timerange import TimeRange as tr
 import datetime as dt
 from os.path import join
 from sys import path
-path.append('/imaps/holly/home/drew/CoronaTemps/')
+path.append('/imaps/holly/home/ajl7/CoronaTemps/')
 from temperature import TemperatureMap as tmap
 
 start = parse('2011-02-10')
