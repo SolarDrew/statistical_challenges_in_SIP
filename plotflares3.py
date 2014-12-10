@@ -55,17 +55,18 @@ for flare in flares:
         except IndexError:
             continue
     
-    means, fluxes, maxes, times = repeat(starttime, flaretime, timeres=1.0/60.0,
-                                         coords=coords, ar=flare['ar_noaanum'], 
-                                         plotminmax=True)
     # Define times for maps
     delta = dt.timedelta(minutes=1)
     ntimes = int(timerange.seconds()/delta.total_seconds())
     times = [time.start() for time in timerange.split(ntimes)]
     
+    home = '/imaps/sspfs/archive/sdo/aia'
+    data_dir = join(home, 'activeregions/*/data/')
+    maps_dir = join(home, 'activeregions/*/images/')
+    
     for time in times:
         # Load/calculate temperature map data
-        thismap = tmap(time)
+        thismap = tmap(time, data_dir=data_dir, maps_dir=maps_dir)
         thismap.save()
         
         # Crop temperature map to active region
