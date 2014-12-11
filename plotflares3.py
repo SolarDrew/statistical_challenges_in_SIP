@@ -7,6 +7,8 @@ Created on Tue Dec 09 18:15:45 2014
 
 from matplotlib import use
 use('agg')
+import numpy as np
+import matplotlib.pyplot as plt
 from sunpy import wcs
 from sunpy.net import hek
 from sunpy.time import parse_time as parse
@@ -35,6 +37,7 @@ datefile.write('')
 datefile.close()
 
 ar_rad = 75
+ar_temps = []
 
 for flare in flares:
     flaretime = parse(flare['event_starttime'])
@@ -65,23 +68,31 @@ for flare in flares:
     data_dir = '/imaps/sspfs/archive/sdo/aia/activeregions/AR11153/data/'
     maps_dir = '/imaps/holly/home/ajl7/tempmaps'
     
+    means = []
     for time in times:
         # Load/calculate temperature map data
         try:
             thismap = tmap(time, data_dir=data_dir, maps_dir=maps_dir)
             thismap.save()
+        
+            # Crop temperature map to active region
+            x, y = wcs.convert_hg_hpc(region['hgc_x'], region['hgc_y'],
+                                      b0_deg=thismap.heliographic_latitude,
+                                      l0_deg=thismap.carrington_longitude)
+            thismap = thismap.submap([x-ar_rad, x+ar_rad], [y-ar_rad, y+ar_rad])
+            
+            # Append appropriate temperature values to list
+            means.append(np.nanmean(thismap.data))
         except:
             print "Failed", time
-        
-        # Crop temperature map to active region
-        x, y = wcs.convert_hg_hpc(region['hgc_x'], region['hgc_y'],
-                                  b0_deg=thismap.heliographic_latitude,
-                                  l0_deg=thismap.carrington_longitude)
-        thismap = thismap.submap([x-ar_rad, x+ar_rad], [y-ar_rad, y+ar_rad])
-        
-        # Append appropriate temperature values to list
+            means.append(np.nan)
     
     # Append  temperature values for final temperature map to list
+    ar_temps.append(means[-1])
+    # Convert time values to time before flare
+    times = [(t - flaretime).total_seconds()/60 for t in times]
     # Plot temperature values of AR with time for that flare
+    fig = plt.figure()
+    plt.plot(times, means)
     
 # Plot instantaneous temperatures of active regions for all flares
