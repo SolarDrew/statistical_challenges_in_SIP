@@ -67,8 +67,11 @@ for flare in flares:
     
     for time in times:
         # Load/calculate temperature map data
-        thismap = tmap(time, data_dir=data_dir, maps_dir=maps_dir)
-        thismap.save()
+        try:
+            thismap = tmap(time, data_dir=data_dir, maps_dir=maps_dir)
+            thismap.save()
+        except:
+            print "Failed", time
         
         # Crop temperature map to active region
         x, y = wcs.convert_hg_hpc(region['hgc_x'], region['hgc_y'],
