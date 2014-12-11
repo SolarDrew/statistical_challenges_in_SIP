@@ -59,9 +59,11 @@ for flare in flares:
     ntimes = int(timerange.seconds()/delta.total_seconds())
     times = [time.start() for time in timerange.split(ntimes)]
     
-    home = '/imaps/sspfs/archive/sdo/aia'
+    """home = '/imaps/sspfs/archive/sdo/aia'
     data_dir = join(home, 'activeregions/AR11153/data/')
-    maps_dir = join(home, 'activeregions/AR11153/images/')
+    maps_dir = join(home, 'activeregions/AR11153/images/')"""
+    data_dir = '/imaps/sspfs/archive/sdo/aia/activeregions/AR11153/data/'
+    maps_dir = '/imaps/holly/home/ajl7/tempmaps'
     
     for time in times:
         # Load/calculate temperature map data
