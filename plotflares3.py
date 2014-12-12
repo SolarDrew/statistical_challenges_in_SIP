@@ -96,7 +96,7 @@ for flare in flares:
     plt.plot(times, means)
     fname = '{}flare_at_{:%Y%m%dT%H%M}'.format(flare['fl_goescls'],
                                                flare['event_starttime'])
-    plt.savefig(fname)
+    plt.savefig(join('/imaps/holly/home/ajl7/tempplots/', fname))
     plt.close()
     
 # Plot instantaneous temperatures of active regions for all flares
