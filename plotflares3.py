@@ -19,7 +19,7 @@ from sys import path
 path.append('/imaps/holly/home/ajl7/CoronaTemps/')
 from temperature import TemperatureMap as tmap
 
-start = parse('2011-02-10')
+start = parse('2011-02-01')
 end = parse('2011-04-01')
 
 client = hek.HEKClient()
@@ -95,9 +95,8 @@ for flare in flares:
     # Plot temperature values of AR with time for that flare
     fig = plt.figure()
     plt.plot(times, means)
-    print flare['fl_goescls'], flare['event_starttime']
-    fname = '{}flare_at_'.format(flare['fl_goescls'], flare['event_starttime'])
-    fname.replace('.', '_')
+    fname = '{}__{}-class'.format(flare['event_starttime'], flare['fl_goescls'])
+    fname = fname.replace('.', '_')
     plt.savefig(join('/imaps/holly/home/ajl7/tempplots/', fname))
     plt.close()
   except:
