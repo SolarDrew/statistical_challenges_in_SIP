@@ -96,8 +96,8 @@ for flare in flares:
     fig = plt.figure()
     plt.plot(times, means)
     print flare['fl_goescls'], flare['event_starttime']
-    fname = '{}flare_at_'.format(flare['fl_goescls'],
-                                               flare['event_starttime'])
+    fname = '{}flare_at_'.format(flare['fl_goescls'], flare['event_starttime'])
+    fname.replace('.', '_')
     plt.savefig(join('/imaps/holly/home/ajl7/tempplots/', fname))
     plt.close()
   except:
