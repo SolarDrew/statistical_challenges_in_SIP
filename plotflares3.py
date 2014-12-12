@@ -40,6 +40,7 @@ ar_rad = 75
 ar_temps = []
 
 for flare in flares:
+  try:
     flaretime = parse(flare['event_starttime'])
     starttime = flaretime-dt.timedelta(hours=0.5)
     timerange = tr(starttime, flaretime)
@@ -94,9 +95,13 @@ for flare in flares:
     # Plot temperature values of AR with time for that flare
     fig = plt.figure()
     plt.plot(times, means)
-    fname = '{}flare_at_{:%Y%m%dT%H%M}'.format(flare['fl_goescls'],
+    print flare['fl_goescls'], flare['event_starttime']
+    fname = '{}flare_at_'.format(flare['fl_goescls'],
                                                flare['event_starttime'])
     plt.savefig(join('/imaps/holly/home/ajl7/tempplots/', fname))
     plt.close()
+  except:
+    print 'Failed for {} flare at {}'.format(flare['fl_goescls'], flare['event_starttime'])
+    raise
     
 # Plot instantaneous temperatures of active regions for all flares
