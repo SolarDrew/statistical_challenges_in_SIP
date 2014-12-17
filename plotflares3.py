@@ -29,13 +29,6 @@ flares = client.query(hek.attrs.Time(start, end),
 flares = [fl for fl in flares if (fl['ar_noaanum'] > 11137 and 
                                   fl['ar_noaanum'] < 11184)]
 
-fluxes = []
-temps = []
-coords = []
-datefile = open('dates.txt', 'w')
-datefile.write('')
-datefile.close()
-
 ar_rad = 75
 ar_temps = []
 
@@ -55,7 +48,8 @@ for flare in flares:
     if isinstance(region, list):
         try:
             region = region[0]
-        except IndexError:
+        except:# IndexError:
+            print "An error occured for active region AR{}".format(flare['ar_noaanum'])
             continue
     
     # Define times for maps
@@ -66,7 +60,7 @@ for flare in flares:
     """home = '/imaps/sspfs/archive/sdo/aia'
     data_dir = join(home, 'activeregions/AR11153/data/')
     maps_dir = join(home, 'activeregions/AR11153/images/')"""
-    data_dir = '/imaps/sspfs/archive/sdo/aia/activeregions/AR11153/data/'
+    data_dir = '/imaps/sspfs/archive/sdo/aia/activeregions/AR{}/data/'.format(flare['ar_noaanum'])
     maps_dir = '/imaps/holly/home/ajl7/tempmaps'
     
     means = []
@@ -87,6 +81,7 @@ for flare in flares:
         except:
             print "Failed", time
             means.append(np.nan)
+            raise
     
     # Append  temperature values for final temperature map to list
     ar_temps.append(means[-1])
@@ -95,12 +90,12 @@ for flare in flares:
     # Plot temperature values of AR with time for that flare
     fig = plt.figure()
     plt.plot(times, means)
-    fname = '{}__{}-class'.format(flare['event_starttime'], flare['fl_goescls'])
+    fname = 'AR{}/{}__{}-class'.format(flare['ar_noaanum'], flare['event_starttime'], flare['fl_goescls'])
     fname = fname.replace('.', '_')
     plt.savefig(join('/imaps/holly/home/ajl7/tempplots/', fname))
     plt.close()
   except:
     print 'Failed for {} flare at {}'.format(flare['fl_goescls'], flare['event_starttime'])
-    raise
+    #raise
     
 # Plot instantaneous temperatures of active regions for all flares
