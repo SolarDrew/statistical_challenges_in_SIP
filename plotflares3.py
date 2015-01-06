@@ -18,6 +18,43 @@ from os.path import join
 from sys import path
 path.append('/imaps/holly/home/ajl7/CoronaTemps/')
 from temperature import TemperatureMap as tmap
+from astropy import units
+
+
+def flareclass_to_flux(flareclass):
+    """
+    Converts a GOES flare class into the corresponding X-ray flux.
+    
+    Parameters
+    ----------
+    flareclass : string
+        The flare class to convert into X-ray flux, as a string. 
+        E.g.: 'X3.2', 'm1.5', 'A9.6'.
+    
+    Returns
+    -------
+    flux : astropy.units.Quantity
+        X-ray flux between 1 and 8 Angstroms as measured near Earth in W/m^2
+    
+    Examples
+    --------
+    >>> flareclass_to_flux('A1.0')
+    1e-08
+    >>> flareclass_to_flux('c4.7')
+    4.7e-06
+    >>> flareclass_to_flux('X2.4')
+    0.00024
+
+    """
+    assert isinstance(flareclass, str)
+    flareclass = flareclass.upper()
+    conversions = {'A': 1.0e-8, 'B': 1.0e-7, 'C': 1.0e-6, 'M': 1.0e-5,
+                   'X': 1.0e-4}
+    fluxval = float(flareclass[1:]) * conversions[flareclass[0]]
+    flux = units.Quantity(fluxval, "W/m^2")
+    
+    return flux
+
 
 start = parse('2011-02-01')
 end = parse('2011-04-01')
@@ -31,6 +68,7 @@ flares = [fl for fl in flares if (fl['ar_noaanum'] > 11137 and
 
 ar_rad = 75
 ar_temps = []
+fl_classes = []
 
 for flare in flares:
   try:
@@ -81,10 +119,8 @@ for flare in flares:
         except:
             print "Failed", time
             means.append(np.nan)
-            raise
+            #raise
     
-    # Append  temperature values for final temperature map to list
-    ar_temps.append(means[-1])
     # Convert time values to time before flare
     times = [(t - flaretime).total_seconds()/60 for t in times]
     # Plot temperature values of AR with time for that flare
@@ -94,8 +130,16 @@ for flare in flares:
     fname = fname.replace('.', '_')
     plt.savefig(join('/imaps/holly/home/ajl7/tempplots/', fname))
     plt.close()
+    # Append  temperature values for final temperature map to list
+    ar_temps.append(means[-1])
+    # Append class of flare to list
+    fl_classes.append(flareclass_to_flux(flare['fl_goescls']))
   except:
     print 'Failed for {} flare at {}'.format(flare['fl_goescls'], flare['event_starttime'])
-    #raise
+    raise
     
-# Plot instantaneous temperatures of active regions for all flares
+# Plot instantaneous temperatures of active regions for all flares against flare class
+fig = plt.figure()
+plt.plot(ar_temps, fl_classes)
+plt.savefig("/imaps/holly/home/ajl7/tempplots/allflares")
+plt.close()
