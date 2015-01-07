@@ -119,7 +119,7 @@ for flare in flares:
         except:
             print "Failed", time
             means.append(np.nan)
-            #raise
+            raise
     
     # Convert time values to time before flare
     times = [(t - flaretime).total_seconds()/60 for t in times]
@@ -133,11 +133,11 @@ for flare in flares:
     # Append  temperature values for final temperature map to list
     ar_temps.append(means[-1])
     # Append class of flare to list
-    fl_classes.append(flareclass_to_flux(flare['fl_goescls']))
+    fl_classes.append(flareclass_to_flux(str(flare['fl_goescls'])).value)
   except:
     print 'Failed for {} flare at {}'.format(flare['fl_goescls'], flare['event_starttime'])
     raise
-    
+
 # Plot instantaneous temperatures of active regions for all flares against flare class
 fig = plt.figure()
 plt.plot(ar_temps, fl_classes)
