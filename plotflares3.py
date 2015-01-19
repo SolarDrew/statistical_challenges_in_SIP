@@ -57,7 +57,7 @@ def flareclass_to_flux(flareclass):
 
 
 start = parse('2011-02-01')
-end = parse('2011-04-01')
+end = parse('2011-03-01')
 
 client = hek.HEKClient()
 flares = client.query(hek.attrs.Time(start, end),
@@ -67,8 +67,15 @@ flares = [fl for fl in flares if (fl['ar_noaanum'] > 11137 and
                                   fl['ar_noaanum'] < 11184)]
 
 ar_rad = 75
-ar_temps = []
+ar_temps_fltime = []
+ar_temps_1 = []
+ar_temps_10 = []
+ar_temps_30 = []
 fl_classes = []
+
+flarelist = open("flarelist.txt", w)
+
+fig = plt.figure()
 
 for flare in flares:
   try:
@@ -76,6 +83,7 @@ for flare in flares:
     starttime = flaretime-dt.timedelta(hours=0.5)
     timerange = tr(starttime, flaretime)
 
+    flarelist.write(flaretime.date, flaretime.time, "&", flare['fl_goescls'], "&", flare['ar_noaanum'], "\\\\")
     region = client.query(hek.attrs.EventType('AR'),
                           hek.attrs.Time(flaretime-dt.timedelta(minutes=5), 
                                          flaretime))
@@ -99,14 +107,16 @@ for flare in flares:
     data_dir = join(home, 'activeregions/AR11153/data/')
     maps_dir = join(home, 'activeregions/AR11153/images/')"""
     data_dir = '/imaps/sspfs/archive/sdo/aia/activeregions/AR{}/data/'.format(flare['ar_noaanum'])
-    maps_dir = '/imaps/holly/home/ajl7/tempmaps'
+    maps_root = '/imaps/sspfs/archive/sdo/aia/fulldisk/images/' #'/imaps/holly/home/ajl7/tempmaps'
     
     means = []
     for time in times:
         # Load/calculate temperature map data
+        print time
         try:
+            maps_dir = join(maps_root, "{:%Y/%m/%d}/temperature/".format(time))
             thismap = tmap(time, data_dir=data_dir, maps_dir=maps_dir)
-            thismap.save()
+            #thismap.save()
         
             # Crop temperature map to active region
             x, y = wcs.convert_hg_hpc(region['hgc_x'], region['hgc_y'],
@@ -119,27 +129,51 @@ for flare in flares:
         except:
             print "Failed", time
             means.append(np.nan)
-            raise
+            #raise
     
     # Convert time values to time before flare
     times = [(t - flaretime).total_seconds()/60 for t in times]
     # Plot temperature values of AR with time for that flare
-    fig = plt.figure()
+    ##fig = plt.figure()
     plt.plot(times, means)
-    fname = 'AR{}/{}__{}-class'.format(flare['ar_noaanum'], flare['event_starttime'], flare['fl_goescls'])
-    fname = fname.replace('.', '_')
-    plt.savefig(join('/imaps/holly/home/ajl7/tempplots/', fname))
-    plt.close()
+    ##fname = 'AR{}/{}__{}-class'.format(flare['ar_noaanum'], flare['event_starttime'], flare['fl_goescls'])
+    ##fname = fname.replace('.', '_')
+    ##plt.savefig(join('/imaps/holly/home/ajl7/tempplots/', fname))
+    ##plt.close()
     # Append  temperature values for final temperature map to list
-    ar_temps.append(means[-1])
+    ar_temps_fltime.append(means[-1])
+    ar_temps_1.append(means[-2])
+    ar_temps_10.append(means[-11])
+    ar_temps_30.append(means[0])
     # Append class of flare to list
-    fl_classes.append(flareclass_to_flux(str(flare['fl_goescls'])).value)
+    fl_classes.append(np.log10(flareclass_to_flux(str(flare['fl_goescls'])).value))
   except:
     print 'Failed for {} flare at {}'.format(flare['fl_goescls'], flare['event_starttime'])
-    raise
+    #raise
 
+flarelist.close()
+
+plt.ylim(5.9, 6.3)
+plt.savefig("/imaps/holly/home/ajl7/tempplots/allars")
+plt.close()
 # Plot instantaneous temperatures of active regions for all flares against flare class
 fig = plt.figure()
-plt.plot(ar_temps, fl_classes)
+plt.add_subplot(2, 2, 1)
+plt.title("At time of flare")
+plt.scatter(ar_temps, fl_classes)
+plt.ylabel("GOES flux of flare")
+plt.add_subplot(2, 2, 2)
+plt.title("1 minute before flare")
+plt.scatter(ar_temps, fl_classes)
+plt.add_subplot(2, 2, 3)
+plt.title("10 minutes before flare")
+plt.scatter(ar_temps, fl_classes)
+plt.ylabel("GOES flux of flare")
+plt.xlabel("Mean temperature of active region")
+plt.add_subplot(2, 2, 4)
+plt.title("30 minutes before flare")
+plt.scatter(ar_temps, fl_classes)
+plt.xlabel("Mean temperature of active region")
+#plt.ylim(0.0, 0.0005)
 plt.savefig("/imaps/holly/home/ajl7/tempplots/allflares")
 plt.close()
