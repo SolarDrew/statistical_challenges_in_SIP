@@ -79,12 +79,12 @@ fl_classes = []
 flarelist = open("/imaps/holly/home/ajl7/tempplots/flarelist.txt", "w")
 
 absfig = plt.figure(figsize=(24, 8))
-axs1 = absfig.add_subplot(1, 3, 1)
-axs1.set_title('Temperature value over time')
-axs2 = absfig.add_subplot(1, 3, 2)
-axs2.set_title('Running difference')
-axs3 = absfig.add_subplot(1, 3, 3)
-axs3.set_title('Difference from temperature at flare time')
+axa1 = absfig.add_subplot(1, 3, 1)
+axa1.set_title('Temperature value over time')
+axa2 = absfig.add_subplot(1, 3, 2)
+axa2.set_title('Running difference')
+axa3 = absfig.add_subplot(1, 3, 3)
+axa3.set_title('Difference from temperature at flare time')
 
 ratfig = plt.figure(figsize=(10, 10))
 axr1 = ratfig.add_subplot(2, 2, 1)
