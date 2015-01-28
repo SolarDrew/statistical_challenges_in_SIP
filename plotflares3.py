@@ -59,7 +59,16 @@ def flareclass_to_flux(flareclass):
     return flux
 
 
-parameter = 'max'
+def p95(data):
+    return np.percentile(data, 95)
+
+
+def p5(data):
+    return np.percentile(data, 5)
+
+
+parameter = 'mean'
+functions = {'mean': np.nanmean, 'max': np.nanmax, 'p95': p95, 'p5': p5}
 savedir = "/imaps/holly/home/ajl7/tempplots_{}/".format(parameter)
 
 start = parse('2011-02-01')
@@ -160,9 +169,7 @@ for flare in flares:
             thismap = thismap.submap([x-ar_rad, x+ar_rad], [y-ar_rad, y+ar_rad])
 
             # Append appropriate temperature values to list
-            #means.append(np.nanmean(thismap.data))
-            means.append(np.nanmax(thismap.data))
-            #means.append(np.percentile(thismap.data, 95))
+            means.append(functions[parameter](thismap.data))
             if len(means) > 1:
                 runningdiffT.append(means[-1]-means[-2])
             else:
