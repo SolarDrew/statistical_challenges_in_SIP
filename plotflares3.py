@@ -59,8 +59,11 @@ def flareclass_to_flux(flareclass):
     return flux
 
 
+parameter = 'max'
+savedir = "/imaps/holly/home/ajl7/tempplots_{}/".format(parameter)
+
 start = parse('2011-02-01')
-end = parse('2011-03-01')
+end = parse('2011-02-02')
 
 client = hek.HEKClient()
 flares = client.query(hek.attrs.Time(start, end),
@@ -76,13 +79,13 @@ ar_temps_10 = []
 ar_temps_30 = []
 fl_classes = []
 
-flarelist = open("/imaps/holly/home/ajl7/tempplots_max/flarelist.txt", "w")
+flarelist = open(join(savedir, "flarelist.txt"), "w")
 
 absfig, (axa1, axa2, axa3) = plt.subplots(3, 2, sharex='col', sharey='row', figsize=(16, 24))
 axa1[0].set_title('A, B and C class flares')
 axa1[1].set_title('M and X class flares')
-axa1[0].set_ylabel('Max log(T)')
-axa2[0].set_ylabel('Running difference max log(T)')
+axa1[0].set_ylabel('{} log(T)'.format(parameter.title()))
+axa2[0].set_ylabel('Running difference {} log(T)'.format(parameter))
 axa3[0].set_ylabel('log(T) difference from flare onset time')
 axa3[0].set_xlabel('Time (minutes before flare onset)')
 axa3[1].set_xlabel('Time (minutes before flare onset)')
@@ -134,9 +137,6 @@ for flare in flares:
     ntimes = int(timerange.seconds()/delta.total_seconds())
     times = [time.start() for time in timerange.split(ntimes)]
     
-    """home = '/imaps/sspfs/archive/sdo/aia'
-    data_dir = join(home, 'activeregions/AR11153/data/')
-    maps_dir = join(home, 'activeregions/AR11153/images/')"""
     data_dir = '/imaps/sspfs/archive/sdo/aia/activeregions/AR{}/data/'.format(flare['ar_noaanum'])
     maps_root = '/imaps/sspfs/archive/sdo/aia/fulldisk/images/' #'/imaps/holly/home/ajl7/tempmaps'
     
@@ -225,8 +225,8 @@ flarelist.close()
 axa1[0].set_ylim(limits1[0]-0.02, limits1[1]+0.02)
 axa2[0].set_ylim(limits2[0]-0.005, limits2[1]+0.005)
 axa3[0].set_ylim(limits3[0]-0.005, limits3[1]+0.005)
-absfig.savefig("/imaps/holly/home/ajl7/tempplots_max/allars")
-#ratfig.savefig("/imaps/holly/home/ajl7/tempplots/tempratios")
+absfig.savefig(join(savedir, "allars"))
+#ratfig.savefig(join(savedir, "tempratios"))
 plt.close('all')
 
 # Plot instantaneous temperatures of active regions for all flares against flare class
@@ -275,7 +275,7 @@ for i in range(len(ar_temps_10)):
        	pass
 ax3.scatter(ar_temps_1, fl_classes)
 ax3.set_ylabel("GOES flux of flare")
-ax3.set_xlabel("Mean temperature of active region")
+ax3.set_xlabel("{} temperature of active region".format(parameter.title()))
 #ax3.set_yscale('log')
 ax4.set_title("At time of flare")
 ax4.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
@@ -293,9 +293,9 @@ for i in range(len(ar_temps_1)):
     except IndexError:
        	pass
 ax4.scatter(ar_temps_fltime, fl_classes)
-ax4.set_xlabel("Mean temperature of active region")
+ax4.set_xlabel("{} temperature of active region".format(parameter.title()))
 #ax4.set_yscale('log')
-plt.savefig("/imaps/holly/home/ajl7/tempplots_max/allflares")
+plt.savefig(join(savedir, "allflares"))
 plt.close()
 
 # Plot temperature differences of active regions for all flares against flare class
@@ -317,7 +317,6 @@ ax2.axhline(-5, color=scalarMap.to_rgba(flarecolours['M']), linestyle='--')
 ax2.axhline(-4, color=scalarMap.to_rgba(flarecolours['X']), linestyle='--')
 ax2.scatter([ar_temps_fltime[i]-ar_temps_10[i] for i in range(len(ar_temps_fltime))], fl_classes)
 
-ax3.set_title("1 minute before flare")
 ax3.set_title("T(t=1) - T(t=0)")
 ax3.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
 ax3.axhline(-7, color=scalarMap.to_rgba(flarecolours['B']), linestyle='--')
@@ -325,6 +324,7 @@ ax3.axhline(-6, color=scalarMap.to_rgba(flarecolours['C']), linestyle='--')
 ax3.axhline(-5, color=scalarMap.to_rgba(flarecolours['M']), linestyle='--')
 ax3.axhline(-4, color=scalarMap.to_rgba(flarecolours['X']), linestyle='--')
 ax3.scatter([ar_temps_fltime[i]-ar_temps_1[i] for i in range(len(ar_temps_fltime))], fl_classes)
-ax3.set_xlabel("Mean temperature of active region")
-plt.savefig("/imaps/holly/home/ajl7/tempplots_max/allflares")
+
+fig.set_xlabel("Difference from flare onset time")
+plt.savefig(join(savedir, "allflares_diffs"))
 plt.close()
