@@ -26,34 +26,36 @@ flares = client.query(hek.attrs.Time(start, end),
 
 flare = [fl for fl in flares if (fl['ar_noaanum'] == 11158)][0]
 
-ar_rad = 75
-
 flaretime = parse(flare['event_starttime'])
-starttime = flaretime-dt.timedelta(hours=0.5)
+starttime = flaretime-dt.timedelta(hours=6)
 timerange = tr(starttime, flaretime)
 
 region = client.query(hek.attrs.EventType('AR'),
                       hek.attrs.Time(flaretime-dt.timedelta(minutes=5), 
-                                     flaretime))
-if isinstance(region, list): region = region[0]
+                                     flaretime),
+                      hek.attrs.AR.NOAANum == 11158)
+
+if isinstance(region, list): region = region[1]
+
+print region['ar_noaanum']
 
 # Define times for maps
-delta = dt.timedelta(minutes=10)
+delta = dt.timedelta(hours=2)
 ntimes = int(timerange.seconds()/delta.total_seconds())
 times = [time.start() for time in timerange.split(ntimes)]
 
 for time in times:
     # Load/calculate temperature map data
-    print time
-    #maps_dir = join(maps_root, "{:%Y/%m/%d}/temperature/".format(time))
-    thismap = tmap(time)#, data_dir=data_dir, maps_dir=maps_dir)
+    thismap = tmap(time)
     thismap.save()
 
     # Crop temperature map to active region
     x, y = wcs.convert_hg_hpc(region['hgc_x'], region['hgc_y'],
                               b0_deg=thismap.heliographic_latitude,
                               l0_deg=thismap.carrington_longitude)
-    thismap = thismap.submap([x-ar_rad, x+ar_rad], [y-ar_rad, y+ar_rad])
+    #thismap = thismap.submap([x-ar_rad, x+ar_rad], [y-ar_rad, y+ar_rad])
+    thismap = thismap.region_map(region, mapradius=75)
     
     # Plot temperature map with it's 171A counterpart and a context image
-    thismap.compare('171')
+    thismap.compare('171', context_wlen='171', 
+                    savedir='/home/drew/statistical_challenges_in_SIP/')

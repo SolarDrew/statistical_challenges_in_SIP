@@ -188,10 +188,10 @@ for flare in flares:
     ##plt.close()
 
     # Plot ratio of temperatures to given temperature over time
-    axr1.plot(times, [mean/means[-1] for mean in means], label='x = 0', color=ColourVal)
-    axr2.plot(times, [mean/means[-2] for mean in means], label='x = -1', color=ColourVal)
-    axr3.plot(times, [mean/means[-11] for mean in means], label='x = -10', color=ColourVal)
-    axr4.plot(times, [mean/means[0] for mean in means], label='x = -30', color=ColourVal)
+    axr1.plot(times, [mean/means[-1] for mean in means], label='x = 0', color=colourVal)
+    axr2.plot(times, [mean/means[-2] for mean in means], label='x = -1', color=colourVal)
+    axr3.plot(times, [mean/means[-11] for mean in means], label='x = -10', color=colourVal)
+    axr4.plot(times, [mean/means[0] for mean in means], label='x = -30', color=colourVal)
     #plt.ylim(0, 1)
     #plt.legend()
 
