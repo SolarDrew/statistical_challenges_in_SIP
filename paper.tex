@@ -1,23 +1,31 @@
-\documentclass{article}
+\documentclass[referee,a4paper,12pt,traditabstract]{swsc}
 
-\author{Andrew Leonard and Huw Morgan}
-%\email{ajl7@aber.ac.uk}
-%\institution{Institute of Mathematics, Physics and Computer Science, Aberystwyth University, Ceredigion, SY23 3BZ, Wales}
+\usepackage{graphicx}
+\usepackage{txfonts}
+\usepackage{subfigure}
+\usepackage{epstopdf}
+\usepackage{lineno}
+\usepackage[authoryear,round]{natbib}
+\usepackage[backref]{hyperref}
+\usepackage{url}
 
-%\author{Huw Morgan}
-%\email{hum2@aber.ac.uk}
-%\institution{Institute of Mathematics, Physics and Computer Science, Aberystwyth University, Ceredigion, SY23 3BZ, Wales}
+\author{A. Leonard \and H. Morgan}
+
+\institute{Institute of Mathematics, Physics and Computer Science, Aberystwyth University, Ceredigion, SY23 3BZ, Wales\\
+					 \email{ajl7@aber.ac.uk}}
 
 \title{Using temperature distributions of active regions to investigate flare activity}
 
 \begin{document}
 
-\maketitle
+\begin{linenumbers}
 
-%===========================================================================
-\begin{abstract}
-  This is an abstract
-\end{abstract}
+\titlerunning{Temperature distributions of active regions}
+\authorrunning{Leonard and Morgan}
+\abstract{This is an abstract}
+\keywords{}
+
+\maketitle
 
 %===========================================================================
 \section{Introduction}
@@ -49,10 +57,23 @@ Briefly, this method compares the relative brightnesses in each AIA wavelength c
 This allows the temperature of the corona to be estimated for every pixel of an AIA image, resulting in very high resolution temperature maps.
 Crucially, this method produces temperature maps extremely quickly, which allows us to investigate coronal temperatures during localised dynamic events such as flares.
 With other, slower methods, such studies are infeasible due to the computation time required.
-An example temperature map is shown in Figure X. % Include an example temperature map
+An example temperature map is shown in Figure X.
 
 The Paper I method also allows easy 'tracking' of solar regions by cropping the temperature map around a set of Carrington heliographic coordinates, which rotate at approximately the rate of solar rotation.
-This tracking is demonstrated in Figures A, B and C, each of which shows a cropped region of an AIA 17.1nm image containing active region AR11185, the corresponding temperature map and a larger 17.1nm image showing the location of the region in the corona.
+This tracking is demonstrated in Figures \ref{fig:trackdemo1} and \ref{fig:trackdemo2}, each of which shows a cropped region of an AIA 17.1nm image containing active region AR11158, the corresponding temperature map and a larger 17.1nm image showing the location of the region in the corona.
+
+\begin{figure}
+	\centering
+		\includegraphics[scale=0.25]{20110214T194400with171.png}
+	\caption{Top left: Cropped 17.1nm AIA image showing active region AR 11158 at 2011-02-14 19:44:00. Top right: temperature map of active region AR11158 at 2011-02-14 19:44:00. Bottom: Larger 17.1nm image; the blue square outlines the region shown in the top images.}
+	\label{fig:trackdemo1}
+\end{figure}
+\begin{figure}
+	\centering
+		\includegraphics[scale=0.25]{20110214T234400with171.png}
+	\caption{The same images as Figure \ref{fig:trackdemo1} for time 2011-02-14 23:44:00}
+	\label{fig:trackdemo2}
+\end{figure}
 
 \subsection{Active region analysis}
 The method of Paper I was used to investigate the temperatures of the active regions associated with flares which occured betwen 2011-02-01 and 2011-04-01.
@@ -72,8 +93,6 @@ The specific active regions investigated are listed in Table X along with the fl
 
 The first part of the investigation tracked the active regions as they moved across the solar disk and plotted their temperature distributions in the 30 minutes leading up to a flare.
 Then the temperatures of the associated active regions were directly compared for each of the investigated flares.
-
-Sample temperature maps demonstrating the tracking of the active regions are shown in Figures Y - Z
 
 \subsubsection{Long-term temperature distribution}
 For each flare event investigated, a temperature map was calculated for a 50x50 arcsec area around the corresponding active region at 1-minute intervals for the hour preceding the event. % 150x150 arcsec I think? change this
@@ -102,12 +121,12 @@ From this study, it appears that there is no clear link between solar flares and
 This is probably mostly due to the relatively small number of flares studied - a much larger sample size would have to be used to properly determine any link or lack thereof.
 However, this work does demonstrate that it is now possible to study temperature distributions of the corona in high resolution and on short timescales using fast temperature analysis tools such as that described in Paper 1.
 
-\subsubsection{Long-term temperature distribution}
+\subsection{Long-term temperature distribution}
 Figures 1 and 2 show that there is no clear trend in the long-term temperature distribution before flares occur.
 This is also the case for the other active regions investigated. If any trend in temperature does occur before large flares, it may be on a shorter timescale than investigated here, and may only be noticable for very large flares.
 Any further work on this topic should therefore look at shorter timespans with higher cadence, and perhaps only consider active regions associated with X-class flares.
 
-\subsubsection{Temperatures of active regions before flares}
+\subsection{Temperatures of active regions before flares}
 From figure 3 it can be seen that there does appear to be some grouping of flaring active regions into groups of temperatures, and that a few of the larger flares are associated with active regions at higher temperatures than most of the other flares investigated.
 However, no clear correlation can be seen between peak flare flux and active region temperature.
 A much larger sample of flares is needed in order to properly determine whether or not a link exists between the two.
@@ -122,4 +141,5 @@ A much larger sample of flares is needed in order to properly determine whether 
 \bibliographystyle{plainnat}
 \bibliography{C:/Users/Drew/Dropbox/Thesis/thesis_refs,C:/Users/Drew/Documents/library}
 
+\end{linenumbers}
 \end{document}
