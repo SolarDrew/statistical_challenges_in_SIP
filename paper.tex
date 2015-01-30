@@ -52,68 +52,159 @@ This method uses SunPy, a free, open-source Python library for solar physics.
 %===========================================================================
 \section{Method}
 \subsection{Temperature analysis}
-The core of this analysis is the temperature map method described by \cite{Leonard2014} (henceforth Paper I).
+The core of this analysis is the temperature map method described by \cite{Leonard} (henceforth Paper I).
 Briefly, this method compares the relative brightnesses in each AIA wavelength channel at a given time and infers the best-fitting temperature from that comparison.
 This allows the temperature of the corona to be estimated for every pixel of an AIA image, resulting in very high resolution temperature maps.
 Crucially, this method produces temperature maps extremely quickly, which allows us to investigate coronal temperatures during localised dynamic events such as flares.
 With other, slower methods, such studies are infeasible due to the computation time required.
-An example temperature map is shown in Figure X.
+An example temperature map is shown in Figure \ref{fig:example_tmap}.
 
 The Paper I method also allows easy 'tracking' of solar regions by cropping the temperature map around a set of Carrington heliographic coordinates, which rotate at approximately the rate of solar rotation.
 This tracking is demonstrated in Figures \ref{fig:trackdemo1} and \ref{fig:trackdemo2}, each of which shows a cropped region of an AIA 17.1nm image containing active region AR11158, the corresponding temperature map and a larger 17.1nm image showing the location of the region in the corona.
 
 \begin{figure}
 	\centering
-		\includegraphics[scale=0.25]{20110214T194400with171.png}
+		\includegraphics[width=\columnwidth]{2011-02-15T00_00_00.png}
+	\caption{Example temperature map for the full solar corona at 2011-02-15 00:00}
+	\label{fig:example_tmap}
+\end{figure}
+
+\begin{figure}
+	\centering
+		\includegraphics[width=0.9\columnwidth]{20110214T194400with171.png}
 	\caption{Top left: Cropped 17.1nm AIA image showing active region AR 11158 at 2011-02-14 19:44:00. Top right: temperature map of active region AR11158 at 2011-02-14 19:44:00. Bottom: Larger 17.1nm image; the blue square outlines the region shown in the top images.}
 	\label{fig:trackdemo1}
 \end{figure}
 \begin{figure}
 	\centering
-		\includegraphics[scale=0.25]{20110214T234400with171.png}
-	\caption{The same images as Figure \ref{fig:trackdemo1} for time 2011-02-14 23:44:00}
+		\includegraphics[width=0.9\columnwidth]{20110214T234400with171.png}
+	\caption{The same images as Figure \ref{fig:trackdemo1} for time 2011-02-14 23:44:00.}
 	\label{fig:trackdemo2}
 \end{figure}
 
 \subsection{Active region analysis}
-The method of Paper I was used to investigate the temperatures of the active regions associated with flares which occured betwen 2011-02-01 and 2011-04-01.
-The specific active regions investigated are listed in Table X along with the flares associated with each. % Include a table of the flares looked at, when they occured and which active region they're associated with.
+The temperature map method described in Paper I was used to investigate the temperatures of the active regions associated with flares which occured during February 2011.
+This month was chosen because several flares occured during this time with a wide range of peak fluxes.
+The flares detected included many small flares (A, B and C class) as well as several larger M class flares and a single X class flare. % Double-check if there are any A or more Xes
+
+For each flare event investigated, a temperature map was calculated for a 150 x 150 arcsec area around the corresponding active region at 1-minute intervals for the 30 minutes preceding the start of the flare.
+The maximum, 95th percentile, mean, 5th percentile and minimum were then calculated for each temperature map for each flare in order to compare if and how the bulk temperature of the active regions changed before the flare.
+The 95th and 5th percentiles were calculated because the maximum and minimum may be affected by small numbers of unusually high or low temperature pixels, which may not accurately represent how the bulk temperature of the active region changes with time.
+
+The start times of the flares and the locations of the active regions on the solar disk were obtained by querying the Heliophysics Events Knowledgebase (HEK).
+The specific flares investigated are listed in Table \ref{tab:flares} along with the active region associated with each.
+Note that not all flares occuring in this time were studied, since for some flares the neccessary AIA data were not available to temperature map the full 30-minute range before the flare onset.
+Flares with missing data were therefore not studied.
 
 \begin{table}
 	\centering
 		\begin{tabular}{c|c|c}
 			Date and time & GOES class & NOAA Active region \\
 			\hline
-			
+			% PUT THINGS HERE
 		\end{tabular}
-	\caption{Times and associated active regions of solar flares studied}
+	\caption{Start times and associated active regions of solar flares studied during 2011-02.}
 	\label{tab:flares}
-	% Many of these won't be there because of not working
 \end{table}
 
 The first part of the investigation tracked the active regions as they moved across the solar disk and plotted their temperature distributions in the 30 minutes leading up to a flare.
 Then the temperatures of the associated active regions were directly compared for each of the investigated flares.
 
-\subsubsection{Long-term temperature distribution}
-For each flare event investigated, a temperature map was calculated for a 50x50 arcsec area around the corresponding active region at 1-minute intervals for the hour preceding the event. % 150x150 arcsec I think? change this
-The times of the flares and the locations of the active regions on the solar disk were obtained by querying the Heliophysics Events Knowledgebase (HEK).
-How the temperature distribution changes with time was then compared to when associated flares occur for each active region.
-The mean (and standard deviation? percentiles?, etc) of the temperature map was calculated at each time step and these values were plotted for each flare.
-
-\subsubsection{Temperatures of active regions before flares}
-For each flare the 95th percentile temperature was calculated from one temperature map of the corresponding active region.
-This map was chosen as the latest map before the start time of the flare. % was it?
-All flares were then plotted on a scatter graph of this temperature against the peak GOES flux of the flare.
-
 %===========================================================================
 \section{Results}
-%Figures 1 and 2 show the mean, standard deviation, 95th percentile and maximum temperature of active regions AR11146 and AR11149 respectively, as functions of time. %None of this is true6 becaus6e I'm not doing those plots any more
-The times of the associated flares are also plotted.
-These regions were chosen as they are typical of the results found for other active regions, and show similar temperature profiles but different numbers of flares.
-In both plots, some time before a flare or group of flares occur, the maximum temperature rises significantly but the bulk temperature of the region varies relatively little.
-Figure 3 plots the peak flux for all flares associated with the studied active regions against the 95th percentile temperature for the corresponding active regions before the beginning of the flare.
-Most of these flares are grouped around log(T) $\approx$ 6.35, 6.55 and 6.7, with fewer flares associated with hotter active regions, generally.
-However, the strongest flares observed do appear to be associated with hotter active regions.
+\subsection{Temperature change over time}
+Figures \ref{fig:allars_max}, \ref{fig:allars_p95}, \ref{fig:allars_mean}, \ref{fig:allars_p5} and \ref{fig:allars_min} show how the temperature properties of the active region changed during the 30 minutes preceding each flare.
+All of the flares studied are plotted in each of these figures so that any changes common to many flares can be easily noticed.
+The maximum, 95th percentile, mean, 5th percentile and minimum are plotted in figures \ref{fig:allars_max}, \ref{fig:allars_p95}, \ref{fig:allars_mean}, \ref{fig:allars_p5} and \ref{fig:allars_min} respectively.
+In each figure, the top panels show the variation of the relevant parameter's value with time, the middle panels show the running difference and the bottom panes show the difference from the value at the start time of the flare.
+A, B and C class flares are plotted in the panels on the left, while M and X class flares are shown on the right. % Again, double-check if there are any A class or multiple X classes
+
+% Description of plots for maximum
+From the plots in Figure \ref{fig:allars_max} it can be seen that the maximum temperature of each active region varies significantly, with no clear increase or decrease at any particular time before the flare.
+This is the case for both small and large flares.
+However, it is perhaps interesting to note that many of the active regions associated with C class flares show temperature spikes which reach much higher temperatures than other ARs studied, even those associated with larger flares.
+
+% Description of plots for 95
+% Description of plots for mean
+% Description of plots for 5
+% Description of plots for minimum
+
+\begin{figure}
+	\centering
+		\includegraphics[width=0.7\columnwidth]{tempplotsmax/allars.png}
+	\caption{Change in maximum temperature of the corresponding active region plotted for each flare as a function of time before the flare began. Top: maximum temperature against time. Middle: running difference of maximum temperature. Bottom: difference of maximum temperature from maximum temperature at flare start time. Left: A, B and C class flares, denoted by dark red, orange and yellow lines, respectively. Right: M and X class flares, denoted by red and orange lines, repectively.}
+	\label{fig:allars_max}
+\end{figure}
+\begin{figure}
+	\centering
+		\includegraphics[width=0.7\columnwidth]{tempplotsmax/allars.png}
+	\caption{Change in 95th percentile temperature of the corresponding active region plotted for each flare as a function of time before the flare began. Plots and colour-coding are the same as in Figure \ref{fig:allars_max}}
+	\label{fig:allars_p95}
+\end{figure}
+\begin{figure}
+	\centering
+		\includegraphics[width=0.7\columnwidth]{tempplotsmean/allars.png}
+	\caption{Change in mean temperature of the corresponding active region plotted for each flare as a function of time before the flare began. Plots and colour-coding are the same as in Figure \ref{fig:allars_max}}
+	\label{fig:allars_mean}
+\end{figure}
+\begin{figure}
+	\centering
+		\includegraphics[width=0.7\columnwidth]{tempplotsmax/allars.png}
+	\caption{Change in 5th percentile temperature of the corresponding active region plotted for each flare as a function of time before the flare began. Plots and colour-coding are the same as in Figure \ref{fig:allars_max}}
+	\label{fig:allars_p5}
+\end{figure}
+\begin{figure}
+	\centering
+		\includegraphics[width=0.7\columnwidth]{tempplotsmax/allars.png}
+	\caption{Change in minimum temperature of the corresponding active region plotted for each flare as a function of time before the flare began. Plots and colour-coding are the same as in Figure \ref{fig:allars_max}}
+	\label{fig:allars_min}
+\end{figure}
+
+\subsection{Flare flux vs temperature}
+For each temperature parameter, the value for each flare was plotted on a scatter graph against the peak flux of the flare (Figures V - Z).
+This was done for four times in each case: 30 minutes before the flare start time, 10 minutes before, 1 minute before and at the flare start time.
+
+% Description of plots for maximum
+Figure \ref{fig:allflares_max} shows that the maximum temperatures of the ARs studied are closely grouped around a few temperature values.
+This remains the case throughout the 30 minutes before the flare, despite the fact that the temperature of many of these active regions rises and falls significantly during this time.
+This sudden increase or decrease of temperature is particularly noticeable in the active regions associated with C class flares, as can also be seen in Figure \ref{fig:allars_max}.
+
+% Description of plots for 95
+% Description of plots for mean
+% Description of plots for 5
+% Description of plots for minimum
+
+\begin{figure}
+	\centering
+		\includegraphics[width=0.9\columnwidth]{tempplotsmax/allflares.png}
+	\caption{Scatter graph of flare peak flux against active region maximum temperature for four different times. Top left: 30 minutes before flare start time. Top right: 10 minutes before flare start time. Bottom left: 1 minute before flare start time. Bottom right: flare start time. The red and blue arrows indicate the amount by which the temperature of each active region rose or fell respectively since the time of the previous plot. In each plot the dashed lines indicate the lower thresholds for A, B, C, M and X class flares.}
+	\label{fig:allflares_max}
+\end{figure}
+\begin{figure}
+	\centering
+		\includegraphics[width=0.9\columnwidth]{tempplotsmax/allflares.png}
+	\caption{Scatter graph of flare peak flux against 95th percentile temperature of the corresponding active regions for the same four times as in Figure \ref{fig:allflares_max}.}
+	\label{fig:allflares_p95}
+\end{figure}
+\begin{figure}
+	\centering
+		\includegraphics[width=0.9\columnwidth]{tempplotsmean/allflares.png}
+	\caption{Scatter graph of flare peak flux against mean temperature of the corresponding active regions for the same four times as in Figure \ref{fig:allflares_max}.}
+	\label{fig:allflares_mean}
+\end{figure}
+\begin{figure}
+	\centering
+		\includegraphics[width=0.9\columnwidth]{tempplotsmax/allflares.png}
+	\caption{Scatter graph of flare peak flux against 95th percentile temperature of the corresponding active regions for the same four times as in Figure \ref{fig:allflares_max}.}
+	\label{fig:allflares_p5}
+\end{figure}
+\begin{figure}
+	\centering
+		\includegraphics[width=0.9\columnwidth]{tempplotsmax/allflares.png}
+	\caption{Scatter graph of flare peak flux against 95th percentile temperature of the corresponding active regions for the same four times as in Figure \ref{fig:allflares_max}.}
+	\label{fig:allflares_min}
+\end{figure}
+
 
 %===========================================================================
 \section{Discussion and conclusions}
