@@ -73,7 +73,7 @@ functions = {'mean': np.nanmean, 'max': np.nanmax, 'min': np.nanmin,
 savedir = "/imaps/holly/home/ajl7/tempplots_{}/".format(parameter.replace(' ', '_'))
 
 start = parse('2011-02-01')
-end = parse('2011-03-01')
+end = parse('2011-02-02')
 
 client = hek.HEKClient()
 flares = client.query(hek.attrs.Time(start, end),
@@ -83,15 +83,11 @@ flares = [fl for fl in flares if (fl['ar_noaanum'] > 11137 and
                                   fl['ar_noaanum'] < 11184)]
 
 ar_rad = 75
-ar_temps_fltime = []
-ar_temps_1 = []
-ar_temps_10 = []
-ar_temps_30 = []
 fl_classes = []
 
 flarelist = open(join(savedir, "flarelist.txt"), "w")
 
-absfig, (axa1, axa2, axa3) = plt.subplots(3, 2, sharex='col', sharey='row', figsize=(16, 24))
+"""absfig, (axa1, axa2, axa3) = plt.subplots(3, 2, sharex='col', sharey='row', figsize=(16, 24))
 axa1[0].set_title('A, B and C class flares')
 axa1[1].set_title('M and X class flares')
 axa1[0].set_ylabel('{} log(T)'.format(parameter.title()))
@@ -105,7 +101,7 @@ axa3[0].axhline(0, linestyle='--', color='black')
 axa3[1].axhline(0, linestyle='--', color='black')
 limits1 = (1000, -1000)
 limits2 = (1000, -1000)
-limits3 = (1000, -1000)
+limits3 = (1000, -1000)"""
 
 """ratfig = plt.figure(figsize=(10, 10))
 axr1 = ratfig.add_subplot(2, 2, 1)
@@ -121,11 +117,11 @@ axr4 = ratfig.add_subplot(2, 2, 4)
 axr4.set_title("T(t)/T(t=-30)")
 axr4.set_xlabel("Time (minutes)")"""
 
-# Set up some colourmap stuff for line-plotting later
+"""# Set up some colourmap stuff for line-plotting later
 cmap = cm = plt.get_cmap('afmhot')
 cNorm  = colours.Normalize(vmin=0, vmax=1)
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cmap)
-flarecolours = [{'A': 0.3, 'B': 0.5, 'C': 0.7}, {'M': 0.4, 'X': 0.6}]
+flarecolours = [{'A': 0.3, 'B': 0.5, 'C': 0.7}, {'M': 0.4, 'X': 0.6}]"""
 
 for flare in flares:
   try:
@@ -153,41 +149,35 @@ for flare in flares:
     times = [time.start() for time in timerange.split(ntimes)]
     
     data_dir = '/imaps/sspfs/archive/sdo/aia/activeregions/AR{}/data/'.format(flare['ar_noaanum'])
-    maps_root = '/imaps/sspfs/archive/sdo/aia/fulldisk/images/' #'/imaps/holly/home/ajl7/tempmaps'
+    maps_root = '/imaps/sspfs/archive/sdo/aia/activeregions/AR{}/images/'.format(flare['ar_noaanum'])
+    paramvals_fname = join(maps_root, '{}__{}'.format(str(flaretime).replace(' ', 'T'), str(flare['fl_goescls']).replace('.', '_')))
     
-    # Create empty lists to store temperature values and running differences
-    # Called means because I did mean first, but used for max, percentiles,
-    # etc sometimes
-    means = []
-    runningdiffT = []
-    for time in times:
+    if not os.path.exists(paramvals_fname):
+      paramvals = np.zeros((5, len(ntimes)))
+      for t, time in times:
         # Load/calculate temperature map data
         print time
         try:
             maps_dir = join(maps_root, "{:%Y/%m/%d}/temperature/".format(time))
             thismap = tmap(time, data_dir=data_dir, maps_dir=maps_dir)
-            thismap.save()
         
             # Crop temperature map to active region
             x, y = wcs.convert_hg_hpc(region['hgc_x'], region['hgc_y'],
                                       b0_deg=thismap.heliographic_latitude,
                                       l0_deg=thismap.carrington_longitude)
             thismap = thismap.submap([x-ar_rad, x+ar_rad], [y-ar_rad, y+ar_rad])
-
-            # Append appropriate temperature values to list
-            means.append(functions[parameter](thismap.data))
-            if len(means) > 1:
-                runningdiffT.append(means[-1]-means[-2])
-            else:
-                runningdiffT.append(0)
-            
+            data = thismap.data
+            paramvals[:, t] = [np.nanmin(data), np.percentile(data, 5),
+                               np.nanmean(data), np.percentile(data, 95),
+                               np.nanmax(data)]
         except:
-            failed = True
             print "Failed", time
-            #means.append(np.nan)
             raise
+        np.savetxt(paramvals_fname, paramvals)
+    else:
+      paramvals = np.loadtxt(paramvals_fname)
 
-    #print means
+    """#print means
     # Convert time values to time before flare
     times = [(t - flaretime).total_seconds()/60 for t in times]
     # Decide line colour based on flare class
@@ -205,7 +195,7 @@ for flare in flares:
     axa1[col].plot(times, means, color=colourVal)
     axa2[col].plot(times, runningdiffT, color=colourVal)
     axa3[col].plot(times, absdiffT, color=colourVal) # Absolute difference
-    #ax3[col].plot(times, [((mean-means[-1])/means[-1])*100 for mean in means], color=colorVal) # Percentage difference
+    #ax3[col].plot(times, [((mean-means[-1])/means[-1])*100 for mean in means], color=colorVal) # Percentage difference"""
 
     """# Plot ratio of temperatures to given temperature over time
     axr1.plot(times, [mean/means[0] for mean in means], label='x = -30', color=colourVal)
@@ -215,24 +205,17 @@ for flare in flares:
     #plt.ylim(0, 1)
     #plt.legend()"""
 
-    # Append  temperature values for final temperature map to list
-    ar_temps_fltime.append(means[-1])
-    ar_temps_1.append(means[-2])
-    ar_temps_10.append(means[-11])
-    ar_temps_30.append(means[0])
     # Append class of flare to list
     fl_classes.append(np.log10(flareclass_to_flux(str(flare['fl_goescls'])).value))
 
-    failed = False
     flarelist.write("{} {} & {} & {} \\\\ \n".format(flaretime.date(), flaretime.time(), flare['fl_goescls'], flare['ar_noaanum']))
   except:
     print 'Failed for {} flare at {}'.format(flare['fl_goescls'], flare['event_starttime'])
-    failed = True
-    #raise
+    raise
 
 flarelist.close()
 
-axa1[0].set_ylim(limits1[0]-0.02, limits1[1]+0.02)
+"""axa1[0].set_ylim(limits1[0]-0.02, limits1[1]+0.02)
 axa1[1].set_ylim(limits1[0]-0.02, limits1[1]+0.02)
 axa2[0].set_ylim(limits2[0]-0.005, limits2[1]+0.005)
 axa2[1].set_ylim(limits2[0]-0.005, limits2[1]+0.005)
@@ -354,3 +337,4 @@ for axis in [ax1, ax2, ax3]:
 
 plt.savefig(join(savedir, "allflares_diffs"))
 plt.close()
+"""
