@@ -16,7 +16,7 @@ from sunpy.net import hek
 from sunpy.time import parse_time as parse
 from sunpy.time.timerange import TimeRange as tr
 import datetime as dt
-from os.path import join
+from os.path import join, exists
 import sys
 from sys import path
 path.append('/imaps/holly/home/ajl7/CoronaTemps/')
@@ -152,9 +152,9 @@ for flare in flares:
     maps_root = '/imaps/sspfs/archive/sdo/aia/activeregions/AR{}/images/'.format(flare['ar_noaanum'])
     paramvals_fname = join(maps_root, '{}__{}'.format(str(flaretime).replace(' ', 'T'), str(flare['fl_goescls']).replace('.', '_')))
     
-    if not os.path.exists(paramvals_fname):
-      paramvals = np.zeros((5, len(ntimes)))
-      for t, time in times:
+    if not exists(paramvals_fname):
+      paramvals = np.zeros((5, ntimes))
+      for t, time in enumerate(times):
         # Load/calculate temperature map data
         print time
         try:
