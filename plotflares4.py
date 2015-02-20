@@ -16,6 +16,7 @@ from sunpy.net import hek
 from sunpy.time import parse_time as parse
 from sunpy.time.timerange import TimeRange as tr
 import datetime as dt
+import os
 from os.path import join, exists
 import sys
 from sys import path
@@ -59,17 +60,7 @@ def flareclass_to_flux(flareclass):
     return flux
 
 
-def p95(data):
-    return np.percentile(data, 95)
-
-
-def p5(data):
-    return np.percentile(data, 5)
-
-
-parameter = '5th %-ile'
-functions = {'mean': np.nanmean, 'max': np.nanmax, 'min': np.nanmin, 
-             '95th %-ile': p95, '5th %-ile': p5}
+parameter = 'mean'
 savedir = "/imaps/holly/home/ajl7/tempplots_{}/".format(parameter.replace(' ', '_'))
 
 start = parse('2011-02-01')
@@ -83,11 +74,15 @@ flares = [fl for fl in flares if (fl['ar_noaanum'] > 11137 and
                                   fl['ar_noaanum'] < 11184)]
 
 ar_rad = 75
+ar_temps_fltime = []
+ar_temps_1 = []
+ar_temps_10 = []
+ar_temps_30 = []
 fl_classes = []
 
 flarelist = open(join(savedir, "flarelist.txt"), "w")
 
-"""absfig, (axa1, axa2, axa3) = plt.subplots(3, 2, sharex='col', sharey='row', figsize=(16, 24))
+absfig, (axa1, axa2, axa3) = plt.subplots(3, 2, sharex='col', sharey='row', figsize=(16, 24))
 axa1[0].set_title('A, B and C class flares')
 axa1[1].set_title('M and X class flares')
 axa1[0].set_ylabel('{} log(T)'.format(parameter.title()))
@@ -101,7 +96,7 @@ axa3[0].axhline(0, linestyle='--', color='black')
 axa3[1].axhline(0, linestyle='--', color='black')
 limits1 = (1000, -1000)
 limits2 = (1000, -1000)
-limits3 = (1000, -1000)"""
+limits3 = (1000, -1000)
 
 """ratfig = plt.figure(figsize=(10, 10))
 axr1 = ratfig.add_subplot(2, 2, 1)
@@ -117,11 +112,11 @@ axr4 = ratfig.add_subplot(2, 2, 4)
 axr4.set_title("T(t)/T(t=-30)")
 axr4.set_xlabel("Time (minutes)")"""
 
-"""# Set up some colourmap stuff for line-plotting later
+# Set up some colourmap stuff for line-plotting later
 cmap = cm = plt.get_cmap('afmhot')
 cNorm  = colours.Normalize(vmin=0, vmax=1)
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cmap)
-flarecolours = [{'A': 0.3, 'B': 0.5, 'C': 0.7}, {'M': 0.4, 'X': 0.6}]"""
+flarecolours = [{'A': 0.3, 'B': 0.5, 'C': 0.7}, {'M': 0.4, 'X': 0.6}]
 
 for flare in flares:
   try:
@@ -150,7 +145,8 @@ for flare in flares:
     
     data_dir = '/imaps/sspfs/archive/sdo/aia/activeregions/AR{}/data/'.format(flare['ar_noaanum'])
     maps_root = '/imaps/sspfs/archive/sdo/aia/activeregions/AR{}/images/'.format(flare['ar_noaanum'])
-    paramvals_fname = join(maps_root, '{}__{}'.format(str(flaretime).replace(' ', 'T'), str(flare['fl_goescls']).replace('.', '_')))
+    params_dir = '/imaps/holly/home/ajl7/AR_temp_params/AR{}/'.format(flare['ar_noaanum'])
+    paramvals_fname = join(params_dir, '{}__{}'.format(str(flaretime).replace(' ', 'T'), str(flare['fl_goescls']).replace('.', '_')))
     
     if not exists(paramvals_fname):
       paramvals = np.zeros((5, ntimes))
@@ -173,11 +169,16 @@ for flare in flares:
         except:
             print "Failed", time
             raise
+        if not exists(params_dir):
+            os.makedirs(params_dir)
         np.savetxt(paramvals_fname, paramvals)
     else:
       paramvals = np.loadtxt(paramvals_fname)
 
-    """#print means
+    # Rename a thing so I don't have to change a load of code.
+    # I'm a bad man
+    means = paramvals[2, :] # Change the index here when not using mean
+    #print means
     # Convert time values to time before flare
     times = [(t - flaretime).total_seconds()/60 for t in times]
     # Decide line colour based on flare class
@@ -188,14 +189,17 @@ for flare in flares:
     else:
         col = 1
     colourVal = scalarMap.to_rgba(flarecolours[col][flcl])
-    absdiffT = [mean-means[-1] for mean in means]
+    absdiffT = means[:] - means[-1]
+    runningdiffT = means.copy()
+    runningdiffT[0] = 0
+    runningdiffT[1:] -= means[:-1]
     limits1 = (min(limits1[0], min(means)), max(limits1[1], max(means)))
     limits2 = (min(limits2[0], min(runningdiffT)), max(limits2[1], max(runningdiffT)))
     limits3 = (min(limits3[0], min(absdiffT)), max(limits3[1], max(absdiffT)))
     axa1[col].plot(times, means, color=colourVal)
     axa2[col].plot(times, runningdiffT, color=colourVal)
     axa3[col].plot(times, absdiffT, color=colourVal) # Absolute difference
-    #ax3[col].plot(times, [((mean-means[-1])/means[-1])*100 for mean in means], color=colorVal) # Percentage difference"""
+    #ax3[col].plot(times, [((mean-means[-1])/means[-1])*100 for mean in means], color=colorVal) # Percentage difference
 
     """# Plot ratio of temperatures to given temperature over time
     axr1.plot(times, [mean/means[0] for mean in means], label='x = -30', color=colourVal)
@@ -205,6 +209,11 @@ for flare in flares:
     #plt.ylim(0, 1)
     #plt.legend()"""
 
+    # Append  temperature values for final temperature map to list
+    ar_temps_fltime.append(means[-1])
+    ar_temps_1.append(means[-2])
+    ar_temps_10.append(means[-11])
+    ar_temps_30.append(means[0])
     # Append class of flare to list
     fl_classes.append(np.log10(flareclass_to_flux(str(flare['fl_goescls'])).value))
 
@@ -215,7 +224,7 @@ for flare in flares:
 
 flarelist.close()
 
-"""axa1[0].set_ylim(limits1[0]-0.02, limits1[1]+0.02)
+axa1[0].set_ylim(limits1[0]-0.02, limits1[1]+0.02)
 axa1[1].set_ylim(limits1[0]-0.02, limits1[1]+0.02)
 axa2[0].set_ylim(limits2[0]-0.005, limits2[1]+0.005)
 axa2[1].set_ylim(limits2[0]-0.005, limits2[1]+0.005)
@@ -337,4 +346,3 @@ for axis in [ax1, ax2, ax3]:
 
 plt.savefig(join(savedir, "allflares_diffs"))
 plt.close()
-"""
