@@ -61,10 +61,12 @@ def flareclass_to_flux(flareclass):
 
 
 parameter = 'mean'
+allpars = ['min', '5th %-ile', 'mean', '95th %-ile', 'max']
+parind = allpars.index(parameter)
 savedir = "/imaps/holly/home/ajl7/tempplots_{}/".format(parameter.replace(' ', '_'))
 
-start = parse('2011-02-01')
-end = parse('2011-02-02')
+start = parse('2011-03-15')
+end = parse('2011-03-22')
 
 client = hek.HEKClient()
 flares = client.query(hek.attrs.Time(start, end),
@@ -169,15 +171,15 @@ for flare in flares:
         except:
             print "Failed", time
             raise
-        if not exists(params_dir):
-            os.makedirs(params_dir)
-        np.savetxt(paramvals_fname, paramvals)
+      if not exists(params_dir):
+          os.makedirs(params_dir)
+      np.savetxt(paramvals_fname, paramvals)
     else:
       paramvals = np.loadtxt(paramvals_fname)
 
     # Rename a thing so I don't have to change a load of code.
     # I'm a bad man
-    means = paramvals[2, :] # Change the index here when not using mean
+    means = paramvals[parind, :]
     #print means
     # Convert time values to time before flare
     times = [(t - flaretime).total_seconds()/60 for t in times]
@@ -220,7 +222,8 @@ for flare in flares:
     flarelist.write("{} {} & {} & {} \\\\ \n".format(flaretime.date(), flaretime.time(), flare['fl_goescls'], flare['ar_noaanum']))
   except:
     print 'Failed for {} flare at {}'.format(flare['fl_goescls'], flare['event_starttime'])
-    raise
+    continue
+    #raise
 
 flarelist.close()
 
