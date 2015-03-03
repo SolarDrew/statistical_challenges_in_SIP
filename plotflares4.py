@@ -170,6 +170,10 @@ for flare in flares:
                                np.nanmax(data)]
         except:
             print "Failed", time
+            paramvals[:, t] = [0, 0, 0, 0, 0]
+            if not exists(params_dir):
+                os.makedirs(params_dir)
+            np.savetxt(paramvals_fname, paramvals)
             raise
       if not exists(params_dir):
           os.makedirs(params_dir)
@@ -177,6 +181,8 @@ for flare in flares:
     else:
       paramvals = np.loadtxt(paramvals_fname)
 
+    if 0 in paramvals:
+        raise ValueError
     # Rename a thing so I don't have to change a load of code.
     # I'm a bad man
     means = paramvals[parind, :]
