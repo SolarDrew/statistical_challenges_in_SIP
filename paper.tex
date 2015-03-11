@@ -61,13 +61,13 @@ They demonstrate the type of study made available by fast temperature analysis o
 \section{Method}
 \subsection{Temperature analysis}
 The core of this analysis is the temperature map method described by \cite{Leonard} (henceforth Paper I).
-Briefly, this method compares the relative brightnesses in each AIA wavelength channel at a given time and infers the best-fitting temperature from that comparison.
+Briefly, this method compares the relative brightnesses in each AIA wavelength channel at a given time and infers the best-fitting temperature from that comparison. % This can be phrased more descriptively
 This allows the temperature of the corona to be estimated for every pixel of an AIA image, resulting in very high resolution temperature maps.
 Crucially, this method produces temperature maps extremely quickly, which allows us to investigate coronal temperatures during localised dynamic events such as flares.
 With other, slower methods, such studies are infeasible due to the computation time required.
 An example temperature map is shown in Figure \ref{fig:example_tmap}.
 
-The Paper I method also allows easy `tracking' of solar regions by cropping the temperature map around a set of Carrington heliographic coordinates, which rotate at approximately the rate of solar rotation.
+The Paper I method also allows easy `tracking' of solar regions by cropping the temperature map around a given pair of Carrington heliographic coordinates, which rotate at approximately the rate of solar rotation.
 This tracking is demonstrated in Figures \ref{fig:trackdemo1} and \ref{fig:trackdemo2}, each of which shows a cropped region of an AIA 17.1nm image containing active region AR11158, the corresponding temperature map and a larger 17.1nm image showing the location of the region in the corona.
 
 \begin{figure}
@@ -91,22 +91,24 @@ This tracking is demonstrated in Figures \ref{fig:trackdemo1} and \ref{fig:track
 \end{figure}
 
 \subsection{Active region analysis}
-The temperature map method described in Paper I was used to investigate the temperatures of the active regions associated with flares which occured during February 2011.
-This month was chosen because several flares occured during this time with a wide range of peak fluxes.
-The flares detected included many small flares (B and C class) as well as several larger M class flares and a single X class flare.
+The temperature map method described in Paper I was used to investigate the temperatures of the active regions associated with flares which occured during February 2011. % And March, hopefully
+This month was chosen because several flares occured during this time with a wide range of peak fluxes. % These months
+The flares detected included many small flares (B and C class) as well as several larger M class flares and a single X class flare. % Double check these numbers to include March
 
-For each flare event investigated, a temperature map was calculated for a 150 x 150 arcsec area around the corresponding active region at 1-minute intervals for the 30 minutes preceding the start of the flare.
+For each flare event investigated, a temperature map was calculated for a 150 x 150 arcsec area around the corresponding active region at 1-minute intervals for the 30 minutes preceding the start of the flare. % Double check temperature map size
 The maximum, 95th percentile, mean, 5th percentile and minimum temperatures were then calculated for each temperature map for each flare in order to compare if and how the bulk temperature of the active regions changed before the flare.
-The 95th and 5th percentiles were calculated because the maximum and minimum may be affected by small numbers of unusually high or low temperature pixels, which may not accurately represent how the bulk temperature of the active region changes with time.
+The 95th and 5th percentiles were calculated because the maximum and minimum may be affected by small numbers of unusually high or low temperature pixels, which may not accurately represent how the bulk temperature of the active region changes with time. % Decide if it's worth doing min and max as well as percentiles
 Each of these parameters was plotted against time for each active region, and was compared to the peak flux of the flares for all active regions.
 
-The start times of the flares and the locations of the active regions on the solar disk were obtained by querying the Heliophysics Events Knowledgebase (HEK).
+The start times of the flares and the locations of the active regions on the solar disk were obtained by querying the Heliophysics Events Knowledgebase (HEK), a database of solar features and events. % Consider putting more detail here
 The specific flares investigated are listed in Table \ref{tab:flares} along with the active region associated with each.
 Note that not all flares occuring in this time were studied, since for some flares the neccessary AIA data were not available to temperature map the full 30-minute range before the flare onset.
 Flares with missing data were excluded from the study.
 
+% Put this table in an appendix if possible
+% Also try and put two sets of columns on a page so it takes up less space
 \begin{longtable}{c|c|c}
-	\caption{Start times and associated active regions of solar flares studied during 2011-02.}\\
+	\caption{Start times and associated active regions of solar flares studied during 2011-02.}\\ % And March
 		Date and time & GOES class & NOAA Active region \\
 		\hline
 		2011-02-01 00:09:00 & B3.0 & 11150 \\ 
