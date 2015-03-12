@@ -115,12 +115,11 @@ Flares with missing data were excluded from the study.
 
 %===========================================================================
 \section{Results}
-\subsection{Temperature change over time}
-Figures \ref{fig:allars_max}, \ref{fig:allars_p95}, \ref{fig:allars_mean}, \ref{fig:allars_p5} and \ref{fig:allars_min} show how the temperature properties of the active region changed during the 30 minutes preceding each flare.
+\subsection{Temperature change over time} \label{sec:temps_v_time}
+Figures \ref{fig:allars_max} - \ref{fig:allars_mean} show how the temperature properties of the active region changed during the 30 minutes preceding each flare.
 All of the flares studied are plotted in each of these figures so that any changes common to many flares can be easily noticed.
-The maximum, 95th percentile, mean, 5th percentile and minimum are plotted in figures \ref{fig:allars_max}, \ref{fig:allars_p95}, \ref{fig:allars_mean}, \ref{fig:allars_p5} and \ref{fig:allars_min} respectively.
-In each figure, the top panels show the variation of the relevant parameter's value with time, the middle panels show the running difference and the bottom panes show the difference from the value at the start time of the flare.
-B and C class flares are plotted in the panels on the left, while M and X class flares are shown on the right.
+The maximum, 95th percentile and mean temperatures are plotted in figures \ref{fig:allars_max}, \ref{fig:allars_p95} and \ref{fig:allars_mean} respectively.
+In each figure, B, C, M and X class flares are plotted separately in the panels from left to right respectively.
 
 % Description of plots for maximum
 From the plots in Figure \ref{fig:allars_max} it can be seen that the maximum temperature of each active region varies significantly, with no clear increase or decrease at any particular time before the flare.
@@ -138,14 +137,12 @@ The top left plot of Figure \ref{fig:allars_mean} shows that the active region w
 However, it is still cooler than several of the B and C class flare active regions.
 The bottom right plot shows that the active regions of the M and X class tend to stay below the temperature at the flare start time, though only by a very small amount and not in all cases.
 
-% Description of plots for 5
-The 5th percentile temperature varies very little, both from region to region and over the time investigated.
-All active regions had a temperature of either log(T) = 5.85 or log(T) = 6.16, with a few regions switching between the two values.
-Regions which produced M and X class flares showed no signs of heating to the higher temperature, staying at a constant log(T) = 5.85 for the duration.
-
-% Description of plots for minimum
-From Figure \ref{fig:allars_min} it appears that the minimum temperature was constant throughout the 30 minutes before the flare for almost every active region.
-One or two active regions which produced C class flares show small dips in the minumim temperature, while all other active regions remain constant at log(T) = 5.85.
+% Description of results for p5 and min
+The 5th-percentile and minimum values of the temperature maps showed very little variation for all active regions.
+The 5th-percentile temperature was either log(T) = 5.85 or log(T) = 6.16 for all regions, with a few switching between the two values during the 30-minute period.
+Similarly, the minimum temperature of all active regions was either log(T) = 5.79, log(T) = 5.80 or log(T) = 5.85 throughout the pre-flare period.
+These temperatures showed no variation with the class of the associated flare.
+Plots of these results are not shown here.
 
 % X-flare lines should be darker on all these plots
 \begin{figure}
@@ -166,23 +163,9 @@ One or two active regions which produced C class flares show small dips in the m
 	\caption{Change in mean temperature of the corresponding active region plotted for each flare as a function of time before the flare began. Plots and colour-coding are the same as in Figure \ref{fig:allars_max}.}
 	\label{fig:allars_mean}
 \end{figure}
-% This can go - adjust the text accordingly
-\begin{figure}
-	\centering
-		\includegraphics[width=\columnwidth]{tempplots_p5/allars.png}
-	\caption{Change in 5th percentile temperature of the corresponding active region plotted for each flare as a function of time before the flare began. Plots and colour-coding are the same as in Figure \ref{fig:allars_max}.}
-	\label{fig:allars_p5}
-\end{figure}
-% This can go - adjust the text accordingly
-\begin{figure}
-	\centering
-		\includegraphics[width=\columnwidth]{tempplots_min/allars.png}
-	\caption{Change in minimum temperature of the corresponding active region plotted for each flare as a function of time before the flare began. Plots and colour-coding are the same as in Figure \ref{fig:allars_max}.}
-	\label{fig:allars_min}
-\end{figure}
 
 \subsection{Flare flux vs temperature}
-For each temperature parameter, the value for each flare was plotted on a scatter graph against the peak flux of the flare (Figs. \ref{fig:allflares_max}, \ref{fig:allflares_p95}, \ref{fig:allflares_mean}, \ref{fig:allflares_p5} and \ref{fig:allflares_min}).
+For each temperature parameter, the value for each flare was plotted on a scatter graph against the peak flux of the flare (Figs. \ref{fig:allflares_max}, \ref{fig:allflares_p95}, \ref{fig:allflares_mean}).
 This was done for four times in each case: 30 minutes before the flare start time, 10 minutes before, 1 minute before and at the flare start time.
 
 % Description of plots for maximum
@@ -199,14 +182,9 @@ Most active regions show no clear link between mean temperature and flare flux, 
 However, it may be worth noting that the flare with the highest flux corresponds to an active region with a temperature near the top of the range shown, while some of the weakest flares correspond to the coolest active regions.
 The mean temperature of many of the active regions fluxuates somewhat, but any changes are quite small and the overall distribution of the plots remains largely the same.
 
-% Description of plots for 5
-The 5th pecentile temperatures of the active regions were found to be grouped into to distinct temperatures, with no apparent dependence on flux.
-A few active regions heat or cool over the time studied, but most remain the same temperature throughout.
-The hotter of the temperatures found was only present in active regions corresponding to B and C class flares, as can also be seen in Figure \ref{fig:allars_p5}.
-
-% Description of plots for minimum
-Figure \ref{fig:allflares_min} shows that all active regions studied had a minimum temperature of log(T) = 5.85 regardless of the flux of the flare produced.
-All active regions appear to remain a constant temperature throughot the time studied.
+% Description of plots for p5 and min
+As described in Section \ref{sec:temps_v_time}, the 5th-percentile and minimum temperatures showed very little variation, both over time and between active regions.
+These values are therefore not shown here since they reveal no useful information.
 
 \begin{figure}
 	\centering
@@ -226,18 +204,6 @@ All active regions appear to remain a constant temperature throughot the time st
 	\caption{Scatter graph of flare peak flux against mean temperature of the corresponding active regions for the same four times as in Figure \ref{fig:allflares_max}.}
 	\label{fig:allflares_mean}
 \end{figure}
-\begin{figure}
-	\centering
-		\includegraphics[width=0.9\columnwidth]{tempplots_p5/allflares.png}
-	\caption{Scatter graph of flare peak flux against 5th percentile temperature of the corresponding active regions for the same four times as in Figure \ref{fig:allflares_max}.}
-	\label{fig:allflares_p5}
-\end{figure}
-\begin{figure}
-	\centering
-		\includegraphics[width=0.9\columnwidth]{tempplots_min/allflares.png}
-	\caption{Scatter graph of flare peak flux against minimum temperature of the corresponding active regions for the same four times as in Figure \ref{fig:allflares_max}.}
-	\label{fig:allflares_min}
-\end{figure}
 
 %===========================================================================
 \section{Discussion and conclusions}
@@ -248,7 +214,7 @@ Future works should therefore aim to consider more large flares.
 Non-flaring active regions should also be taken into account and compared against the results presented here.
 However, this work does demonstrate that it is now possible to study temperature distributions of the corona in high resolution and on short timescales using fast temperature analysis tools such as the one described in \citetalias{Leonard}.
 
-Figures \ref{fig:allars_max} - \ref{fig:allars_min} show that there is no clear trend in any of the temperature parameters investigated before flares occur.
+Figures \ref{fig:allars_max} - \ref{fig:allars_mean} show that there is no clear trend in any of the temperature parameters investigated before flares occur.
 However, this study only looks at quite a short amount of time before flares; an investigation into longer-term temperature distributions may yield better results.
 
 Similarly, no clear correlation can be seen between peak flare flux and active region temperature, but a much larger sample of flares is needed in order to properly determine whether or not a link exists between the two.
