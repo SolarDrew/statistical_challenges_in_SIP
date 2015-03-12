@@ -58,14 +58,14 @@ Rather they are a proof of concept; they demonstrate the type of study made avai
 %===========================================================================
 \section{Method}
 \subsection{Temperature analysis}
-The core of this analysis is the temperature map method described by \cite{Leonard} (henceforth Paper I).
+The core of this analysis is the temperature map method described by \cite{Leonard} (henceforth Paper I). \defcitealias{Leonard}{Paper I}
 Briefly, this method compares the relative brightnesses in each AIA wavelength channel at a given time and infers the best-fitting temperature from that comparison. % This can be phrased more descriptively
 This allows the temperature of the corona to be estimated for every pixel of an AIA image, resulting in very high resolution temperature maps.
 Crucially, this method produces temperature maps extremely quickly, which allows us to investigate coronal temperatures during localised dynamic events such as flares.
 With other, slower methods, such studies are infeasible due to the computation time required.
 An example temperature map is shown in Figure \ref{fig:example_tmap}.
 
-The Paper I method also allows easy `tracking' of solar regions by cropping the temperature map around a given pair of Carrington heliographic coordinates, which rotate at approximately the rate of solar rotation.
+The \citetalias{Leonard} method also allows easy `tracking' of solar regions by cropping the temperature map around a given pair of Carrington heliographic coordinates, which rotate at approximately the rate of solar rotation.
 This tracking is demonstrated in Figures \ref{fig:trackdemo1} and \ref{fig:trackdemo2}, each of which shows a cropped region of an AIA 17.1nm image containing active region AR11158, the corresponding temperature map and a larger 17.1nm image showing the location of the region in the corona.
 
 \begin{figure}
@@ -89,7 +89,7 @@ This tracking is demonstrated in Figures \ref{fig:trackdemo1} and \ref{fig:track
 \end{figure}
 
 \subsection{Active region analysis}
-The temperature map method described in Paper I was used to investigate the temperatures of the active regions associated with flares which occured during February 2011. % And March, hopefully
+The temperature map method described in citetalias{Leonard} was used to investigate the temperatures of the active regions associated with flares which occured during February 2011. % And March, hopefully
 This month was chosen because several flares occured during this time with a wide range of peak fluxes. % These months
 The flares detected included many small flares (B and C class) as well as several larger M class flares and a single X class flare. % Double check these numbers to include March
 
@@ -246,7 +246,7 @@ This is probably mostly due to the relatively small number of flares studied - a
 In particular, this study only included a single X class flare, which as the most energetic are the kind we would most wish to predict.
 Future works should therefore aim to consider more large flares.
 Non-flaring active regions should also be taken into account and compared against the results presented here.
-However, this work does demonstrate that it is now possible to study temperature distributions of the corona in high resolution and on short timescales using fast temperature analysis tools such as the one described in Paper 1.
+However, this work does demonstrate that it is now possible to study temperature distributions of the corona in high resolution and on short timescales using fast temperature analysis tools such as the one described in \citetalias{Leonard}.
 
 Figures \ref{fig:allars_max} - \ref{fig:allars_min} show that there is no clear trend in any of the temperature parameters investigated before flares occur.
 However, this study only looks at quite a short amount of time before flares; an investigation into longer-term temperature distributions may yield better results.
