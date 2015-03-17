@@ -44,19 +44,21 @@ Many studies have been devoted to the topic of flare prediction (eg, \citealt{Ko
 
 Studies of coronal temperatures date back several decades. % Stick some references here to early DEM studies
 However, the Atmospheric Imaging Assembly (AIA; \cite{Lemen2011}) which began observing the Sun in 2010 allows unprecedented access to observations with very high spatial and temporal resolution.
-This allos us to investigate temperature distributions on small spatial scales with high cadence. % Don't much like this sentence, but oh well
-The six Fe-based EUV channels of AIA also provide greater constraints on temperature solutions than previous coronal imagers \citep{Guennou2012, Guennou2012a}.
+This allows investigation of temperature distributions on small spatial scales with high cadence. % Don't much like this sentence, but oh well
+The six Fe-based EUV channels of AIA also provide greater constraints on temperature than previous coronal imagers \citep{Guennou2012, Guennou2012a}.
 
 This work makes use of the capabilities of AIA in order to investigate the temperature distributions of several flaring active regions.
 The aim is to search for a common signature of flare activity in these temperature distributions before flares occur, which, if found, could form the basis of a flare prediction algorithm.
-To achieve this, we look at temperature distributions of the active regions over the 30 minutes before a flare occurs, and we also directly compare the temperatures of the corresponding active regions at several different times before the flares.
+
+%===========================================================================
+\section{Method}
+This investigation looks at temperature distributions of active regions over the 30 minutes before a flare occurs.
+We also directly compare the temperatures of the corresponding active regions at several different times before the flares.
 
 Although it is faster than others of its kind, the temperature-calculating method used here requires a very large amount of AIA data, which can take a long time to download and process.
 As such this work investigates only a relatively small number of flares and the results should not be considered definitive.
 Rather they are a proof of concept; they demonstrate the type of study made available by fast temperature analysis of the corona, which has only been made possible by the high-quality data provided by AIA.
 
-%===========================================================================
-\section{Method}
 \subsection{Temperature analysis}
 The core of this analysis is the temperature map method described by \cite{Leonard} (henceforth Paper I). \defcitealias{Leonard}{Paper I}
 Briefly, this method compares the relative brightnesses in each AIA wavelength channel at a given time and infers the best-fitting temperature from that comparison. % This can be phrased more descriptively
@@ -67,6 +69,8 @@ An example temperature map is shown in Figure \ref{fig:example_tmap}.
 
 The \citetalias{Leonard} method also allows easy `tracking' of solar regions by cropping the temperature map around a given pair of Carrington heliographic coordinates, which rotate at approximately the rate of solar rotation.
 This tracking is demonstrated in Figures \ref{fig:trackdemo1} and \ref{fig:trackdemo2}, each of which shows a cropped region of an AIA 17.1nm image containing active region AR11158, the corresponding temperature map and a larger 17.1nm image showing the location of the region in the corona.
+Note that the small, bright loops in the centre of the active region are highlighted in red, indicating temperatures of up to $log(T) \sim 6.3$, while some larger, fainter loops around the edges are at temperatures of around $log(T) \sim 6.15$.
+These temperatures are consistant with values found by other authors for active region loops. % Reference the shit out of that comment.
 
 \begin{figure}
 	\centering
@@ -106,7 +110,7 @@ Flares with missing data were excluded from the study.
 % Put this table in an appendix if possible
 % Also try and put two sets of columns on a page so it takes up less space
 \begin{longtable}{c|c|c}
-	\caption{Start times and associated active regions of solar flares studied during 2011-02 and 2011-03.}\\
+	\caption{Start times and associated active regions of solar flares studied between 2011/02/01 and 2011/03/31.}\\
 		Date and time & GOES class & NOAA Active region \\
 		\hline
 		\input{tempplotsmean/flarelist.txt}
@@ -210,10 +214,10 @@ These values are therefore not shown here since they reveal no useful informatio
 
 %===========================================================================
 \section{Discussion and conclusions}
-From this study, it appears that there is no clear link between solar flares and coronal temperatures.
+From this study, it appears that there is no clear link between solar flares and the evolution of active region temperatures prior to flaring.
 This is probably mostly due to the relatively small number of flares studied - a much larger sample size would have to be used to properly determine any link or lack thereof.
-In particular, this study only included a single X class flare, which as the most energetic are the kind we would most wish to predict.
-Future works should therefore aim to consider more large flares.
+In particular, this study only included a single X class flare, which are the most energetic and the kind we would most wish to predict.
+Future works should therefore aim to consider larger flares.
 Non-flaring active regions should also be taken into account and compared against the results presented here.
 However, this work does demonstrate that it is now possible to study temperature distributions of the corona in high resolution and on short timescales using fast temperature analysis tools such as the one described in \citetalias{Leonard}.
 
@@ -230,6 +234,7 @@ For this reason, the full distribution of temperatures in the active region shou
 %===========================================================================
 \begin{acknowledgements}
 	This research has made use of SunPy, an open-source and free community-developed solar data analysis package written in Python \citep{Mumford2013}.
+	AIA images courtesy of NASA/SDO and the AIA science team.
 \end{acknowledgements}
 
 %===========================================================================
