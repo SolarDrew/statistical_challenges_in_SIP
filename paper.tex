@@ -107,16 +107,6 @@ The specific flares investigated are listed in Table \ref{tab:flares} along with
 Note that not all flares occuring in this time were studied, since for some flares the neccessary AIA data were not available to temperature map the full 30-minute range before the flare onset.
 Flares with missing data were excluded from the study.
 
-% Put this table in an appendix if possible
-% Also try and put two sets of columns on a page so it takes up less space
-\begin{longtable}{c|c|c}
-	\caption{Start times and associated active regions of solar flares studied between 2011/02/01 and 2011/03/31.}\\
-		Date and time & GOES class & NOAA Active region \\
-		\hline
-		\input{tempplotsmean/flarelist.txt}
-	\label{tab:flares}
-\end{longtable}
-
 %===========================================================================
 \section{Results}
 \subsection{Temperature change over time} \label{sec:temps_v_time}
@@ -151,21 +141,21 @@ Plots of these results are not shown here.
 % X-flare lines should be darker on all these plots
 \begin{figure}
 	\centering
-		\includegraphics[width=\columnwidth]{tempplotsmax/allars.png}
+		\includegraphics[width=\columnwidth]{tempplotsmax/allars_hist.png}
 	\caption{Change in maximum temperature of the corresponding active region plotted for each flare as a function of time before the flare began.
 		Flares are separated by class, with flare peak flux increasing from left to right.}
 	\label{fig:allars_max}
 \end{figure}
 \begin{figure}
 	\centering
-		\includegraphics[width=\columnwidth]{tempplots_p95/allars.png}
+		\includegraphics[width=\columnwidth]{tempplots_p95/allars_hist.png}
 	\caption{Change in 95th percentile temperature of the corresponding active region plotted for each flare as a function of time before the flare began.
 		Plots are the same as in Figure \ref{fig:allars_max}.}
 	\label{fig:allars_p95}
 \end{figure}
 \begin{figure}
 	\centering
-		\includegraphics[width=\columnwidth]{tempplotsmean/allars.png}
+		\includegraphics[width=\columnwidth]{tempplotsmean/allars_hist.png}
 	\caption{Change in mean temperature of the corresponding active region plotted for each flare as a function of time before the flare began.
 		Plots are the same as in Figure \ref{fig:allars_max}.}
 	\label{fig:allars_mean}
@@ -234,11 +224,19 @@ For this reason, the full distribution of temperatures in the active region shou
 %===========================================================================
 \begin{acknowledgements}
 	This research has made use of SunPy, an open-source and free community-developed solar data analysis package written in Python \citep{Mumford2013}.
-	AIA images courtesy of NASA/SDO and the AIA science team.
+	AIA images and data are courtesy of NASA/SDO and the AIA science team.
 \end{acknowledgements}
 
 %===========================================================================
-%\section*{Annexes}
+\section*{Annexes}
+% Also try and put two sets of columns on a page so it takes up less space
+\begin{longtable}{c|c|c}
+	\caption{Start times and associated active regions of solar flares studied between 2011/02/01 and 2011/03/31.}\\
+		Date and time & GOES class & NOAA Active region \\
+		\hline
+		\input{tempplotsmean/flarelist.txt}
+	\label{tab:flares}
+\end{longtable}
 
 %===========================================================================
 \bibliography{C:/Users/Drew/Dropbox/Thesis/thesis_refs,C:/Users/Drew/Documents/library}
