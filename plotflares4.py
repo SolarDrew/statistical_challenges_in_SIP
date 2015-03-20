@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cmx
 import matplotlib.colors as colours
 from sunpy import wcs
+from sunpy.map import Map
 from sunpy.net import hek
 from sunpy.time import parse_time as parse
 from sunpy.time.timerange import TimeRange as tr
@@ -66,7 +67,7 @@ parind = allpars.index(parameter)
 savedir = "/imaps/holly/home/ajl7/tempplots_{}/".format(parameter.replace(' ', '_'))
 
 start = parse('2011-02-01')
-end = parse('2011-04-01')
+end = parse('2011-02-15')
 
 client = hek.HEKClient()
 flares = client.query(hek.attrs.Time(start, end),
@@ -121,9 +122,12 @@ axr4.set_xlabel("Time (minutes)")"""
 cmap = cm = plt.get_cmap('afmhot')
 cNorm  = colours.Normalize(vmin=0, vmax=1)
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cmap)
-flarecolours = {'A': 0.2, 'B': 0.35, 'C': 0.5, 'M': 0.65, 'X': 0.8}
+flarecolours = {'A': 0.2, 'B': 0.3, 'C': 0.4, 'M': 0.5, 'X': 0.6}
+
+allars_hist = np.zeros((141, 30))
 
 for flare in flares:
+  if flare['fl_goescls'] != "M6.6": continue
   try:
     flaretime = parse(flare['event_starttime'])
     starttime = flaretime-dt.timedelta(hours=0.5)
@@ -149,9 +153,12 @@ for flare in flares:
     times = [time.start() for time in timerange.split(ntimes)]
     
     data_dir = '/imaps/sspfs/archive/sdo/aia/activeregions/AR{}/data/'.format(flare['ar_noaanum'])
-    maps_root = '/imaps/sspfs/archive/sdo/aia/activeregions/AR{}/images/'.format(flare['ar_noaanum'])
+    #maps_root = '/imaps/sspfs/archive/sdo/aia/activeregions/AR{}/images/'.format(flare['ar_noaanum'])
+    maps_root = '/imaps/holly/home/ajl7/AR-tmaps/AR{}/'.format(flare['ar_noaanum'])
     params_dir = '/imaps/holly/home/ajl7/AR_temp_params/AR{}/'.format(flare['ar_noaanum'])
     paramvals_fname = join(params_dir, '{}__{}'.format(str(flaretime).replace(' ', 'T'), str(flare['fl_goescls']).replace('.', '_')))
+    print paramvals_fname
+    print exists(paramvals_fname)
     
     if not exists(paramvals_fname):
       paramvals = np.zeros((5, ntimes))
@@ -159,19 +166,32 @@ for flare in flares:
         # Load/calculate temperature map data
         print time
         try:
+            cname = join(data_dir, '{0:%Y/%m/%d}/171'.format(time),
+                         'aia*{0:%Y?%m?%d}?{0:%H?%M?%S}*lev1?fits'.format(time))
+            print cname
+            print exists(cname)
+            coordsmap = Map(cname)
             maps_dir = join(maps_root, "{:%Y/%m/%d}/temperature/".format(time))
-            thismap = tmap(time, data_dir=data_dir, maps_dir=maps_dir)
-        
+
             # Crop temperature map to active region
+            x, y = wcs.convert_hg_hpc(region['hgc_x'], region['hgc_y'],
+                                      b0_deg=coordsmap.heliographic_latitude,
+                                      l0_deg=coordsmap.carrington_longitude)
+            thismap = tmap(time, data_dir=data_dir, maps_dir=maps_dir,
+                           submap=([x-ar_rad, x+ar_rad], [y-ar_rad, y+ar_rad]))
+            thismap.save()
+        
+            """# Crop temperature map to active region
             x, y = wcs.convert_hg_hpc(region['hgc_x'], region['hgc_y'],
                                       b0_deg=thismap.heliographic_latitude,
                                       l0_deg=thismap.carrington_longitude)
-            thismap = thismap.submap([x-ar_rad, x+ar_rad], [y-ar_rad, y+ar_rad])
+            thismap = thismap.submap([x-ar_rad, x+ar_rad], [y-ar_rad, y+ar_rad])"""
             data = thismap.data
             paramvals[:, t] = [np.nanmin(data), np.percentile(data, 5),
                                np.nanmean(data), np.percentile(data, 95),
                                np.nanmax(data)]
         except:
+            raise
             print "Failed", time
             paramvals[:, t] = [0, 0, 0, 0, 0]
             if not exists(params_dir):
@@ -184,8 +204,8 @@ for flare in flares:
     else:
       paramvals = np.loadtxt(paramvals_fname)
 
-    if 0 in paramvals:
-        raise ValueError
+    #if 0 in paramvals:
+    #    raise ValueError
     # Rename a thing so I don't have to change a load of code.
     # I'm a bad man
     means = paramvals[parind, :]
@@ -221,6 +241,9 @@ for flare in flares:
     #plt.ylim(0, 1)
     #plt.legend()"""
 
+    tempinds = [int(round((m - 5.6) * 100)) for m in means]
+    allars_hist[tempinds, times] += 1
+
     # Append  temperature values for final temperature map to list
     ar_temps_fltime.append(means[-1])
     ar_temps_1.append(means[-2])
@@ -232,8 +255,8 @@ for flare in flares:
     flarelist.write("{} {} & {} & {} \\\\ \n".format(flaretime.date(), flaretime.time(), flare['fl_goescls'], flare['ar_noaanum']))
   except:
     print 'Failed for {} flare at {}'.format(flare['fl_goescls'], flare['event_starttime'])
-    continue
     #raise
+    continue
 
 flarelist.close()
 
@@ -247,21 +270,33 @@ absfig.savefig(join(savedir, "allars"))
 #ratfig.savefig(join(savedir, "tempratios"))
 plt.close('all')
 
+fig = plt.figure(figsize=(18, 12))
+plt.imshow(allars_hist[int(round((limits1[0]-5.6)*100)):int(round((limits1[1]-5.6)*100))+1, :],
+           cmap='gray', extent=[-30, 0, limits1[0], limits1[1]], aspect='auto',
+           interpolation='none', origin='lower')
+plt.colorbar(orientation='horizontal')
+plt.title('Number of active regions at a given temperature', size=24)
+plt.xlabel('Time before flare (minutes)', size=20)
+plt.ylabel('Temperature (log(T))', size=20)
+plt.tight_layout()
+plt.savefig(join(savedir, "allars_hist"))
+plt.close()
+
 limits = (1000, -1000)
 # Redefine flare colours for going on the same plot.
 flarecolours = {'A': 0.2, 'B': 0.35, 'C': 0.5, 'M': 0.65, 'X': 0.8}
 # Plot instantaneous temperatures of active regions for all flares against flare class
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, sharex='col', sharey='row', figsize=(18, 18))
-ax1.set_title("30 minutes before flare")
+ax1.set_title("30 minutes before flare", size=24)
 ax1.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
 ax1.axhline(-7, color=scalarMap.to_rgba(flarecolours['B']), linestyle='--')
 ax1.axhline(-6, color=scalarMap.to_rgba(flarecolours['C']), linestyle='--')
 ax1.axhline(-5, color=scalarMap.to_rgba(flarecolours['M']), linestyle='--')
 ax1.axhline(-4, color=scalarMap.to_rgba(flarecolours['X']), linestyle='--')
 ax1.scatter(ar_temps_30, fl_classes)#, color='green')
-ax1.set_ylabel("log(flux)")
+ax1.set_ylabel("log(flux)", size=20)
 limits = (min(limits[0], min(ar_temps_30)), max(limits[1], max(ar_temps_30)))
-ax2.set_title("10 minutes before flare")
+ax2.set_title("10 minutes before flare", size=24)
 ax2.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
 ax2.axhline(-7, color=scalarMap.to_rgba(flarecolours['B']), linestyle='--')
 ax2.axhline(-6, color=scalarMap.to_rgba(flarecolours['C']), linestyle='--')
@@ -278,7 +313,7 @@ for i in range(len(ar_temps_30)):
         pass
 ax2.scatter(ar_temps_10, fl_classes)#, color='green')
 limits = (min(limits[0], min(ar_temps_10)), max(limits[1], max(ar_temps_10)))
-ax3.set_title("1 minute before flare")
+ax3.set_title("1 minute before flare", size=24)
 ax3.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
 ax3.axhline(-7, color=scalarMap.to_rgba(flarecolours['B']), linestyle='--')
 ax3.axhline(-6, color=scalarMap.to_rgba(flarecolours['C']), linestyle='--')
@@ -294,9 +329,9 @@ for i in range(len(ar_temps_10)):
        	pass
 ax3.scatter(ar_temps_1, fl_classes)#, color='green')
 limits = (min(limits[0], min(ar_temps_1)), max(limits[1], max(ar_temps_1)))
-ax3.set_ylabel("log(flux)")
-ax3.set_xlabel("{} temperature of active region".format(parameter.title()))
-ax4.set_title("At time of flare")
+ax3.set_ylabel("log(flux)", size=20)
+ax3.set_xlabel("{} temperature of active region".format(parameter.title()), size=20)
+ax4.set_title("At time of flare", size=24)
 ax4.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
 ax4.axhline(-7, color=scalarMap.to_rgba(flarecolours['B']), linestyle='--')
 ax4.axhline(-6, color=scalarMap.to_rgba(flarecolours['C']), linestyle='--')
@@ -312,7 +347,7 @@ for i in range(len(ar_temps_1)):
        	pass
 ax4.scatter(ar_temps_fltime, fl_classes)#, color='green')
 limits = (min(limits[0], min(ar_temps_fltime)), max(limits[1], max(ar_temps_fltime)))
-ax4.set_xlabel("{} temperature of active region".format(parameter.title()))
+ax4.set_xlabel("{} temperature of active region".format(parameter.title()), size=20)
 for axis in [ax1, ax2, ax3, ax4]:
     axis.set_xlim(limits[0]-0.02, limits[1]+0.02)
 plt.savefig(join(savedir, "allflares"))
@@ -321,7 +356,7 @@ plt.close()
 limits = (1000, -1000)
 # Plot temperature differences of active regions for all flares against flare class
 fig, (ax1, ax2, ax3) = plt.subplots(1, 3, sharex='col', sharey='row', figsize=(24, 8))
-ax1.set_title("T(t=30) - T(t=0)")
+ax1.set_title("T(t=30) - T(t=0)", size=24)
 ax1.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
 ax1.axhline(-7, color=scalarMap.to_rgba(flarecolours['B']), linestyle='--')
 ax1.axhline(-6, color=scalarMap.to_rgba(flarecolours['C']), linestyle='--')
@@ -330,10 +365,10 @@ ax1.axhline(-4, color=scalarMap.to_rgba(flarecolours['X']), linestyle='--')
 dT = [ar_temps_fltime[i]-ar_temps_30[i] for i in range(len(ar_temps_fltime))]
 ax1.scatter(dT, fl_classes)#, color='green')
 limits = (min(limits[0], min(dT)), max(limits[1], max(dT)))
-ax1.set_ylabel("log(flux)")
-ax1.set_xlabel("Difference from flare onset time")
+ax1.set_ylabel("log(flux)", size=20)
+ax1.set_xlabel("Difference from flare onset time", size=20)
 
-ax2.set_title("T(t=10) - T(t=0)")
+ax2.set_title("T(t=10) - T(t=0)", size=24)
 ax2.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
 ax2.axhline(-7, color=scalarMap.to_rgba(flarecolours['B']), linestyle='--')
 ax2.axhline(-6, color=scalarMap.to_rgba(flarecolours['C']), linestyle='--')
@@ -342,9 +377,9 @@ ax2.axhline(-4, color=scalarMap.to_rgba(flarecolours['X']), linestyle='--')
 dT = [ar_temps_fltime[i]-ar_temps_10[i] for i in range(len(ar_temps_fltime))]
 ax2.scatter(dT, fl_classes)#, color='green')
 limits = (min(limits[0], min(dT)), max(limits[1], max(dT)))
-ax2.set_xlabel("Difference from flare onset time")
+ax2.set_xlabel("Difference from flare onset time", size=20)
 
-ax3.set_title("T(t=1) - T(t=0)")
+ax3.set_title("T(t=1) - T(t=0)", size=24)
 ax3.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
 ax3.axhline(-7, color=scalarMap.to_rgba(flarecolours['B']), linestyle='--')
 ax3.axhline(-6, color=scalarMap.to_rgba(flarecolours['C']), linestyle='--')
@@ -353,7 +388,7 @@ ax3.axhline(-4, color=scalarMap.to_rgba(flarecolours['X']), linestyle='--')
 dT = [ar_temps_fltime[i]-ar_temps_1[i] for i in range(len(ar_temps_fltime))]
 ax3.scatter(dT, fl_classes)#, color='green')
 limits = (min(limits[0], min(dT)), max(limits[1], max(dT)))
-ax3.set_xlabel("Difference from flare onset time")
+ax3.set_xlabel("Difference from flare onset time", size=20)
 for axis in [ax1, ax2, ax3]:
     axis.set_xlim(limits[0]-0.02, limits[1]+0.02)
 
