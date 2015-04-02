@@ -25,6 +25,7 @@ path.append('/imaps/holly/home/ajl7/CoronaTemps/')
 from temperature import TemperatureMap as tmap
 from astropy import units
 
+print 'Running plotflares4.py'
 
 def flareclass_to_flux(flareclass):
     """
@@ -61,17 +62,19 @@ def flareclass_to_flux(flareclass):
     return flux
 
 
-parameter = 'mean'
-allpars = ['min', '5th %-ile', 'mean', '95th %-ile', 'max']
+parameter = 'n over threshold'
+allpars = ['min', '5th %-ile', 'mean', '95th %-ile', 'max', 'stdev', 'n over threshold']
 parind = allpars.index(parameter)
 savedir = "/imaps/holly/home/ajl7/tempplots_{}/".format(parameter.replace(' ', '_'))
 
-start = parse('2011-02-01')
-end = parse('2011-02-15')
+start = parse('2011-02-15')
+end = parse('2011-02-16')
 
+print 'querying VSO'
 client = hek.HEKClient()
 flares = client.query(hek.attrs.Time(start, end),
                       hek.attrs.EventType('FL'))
+print 'flare data found'
 
 flares = [fl for fl in flares if (fl['ar_noaanum'] > 11137 and 
                                   fl['ar_noaanum'] < 11184)]
@@ -84,6 +87,9 @@ ar_temps_30 = []
 fl_classes = []
 
 flarelist = open(join(savedir, "flarelist.txt"), "w")
+
+tmapfig, axt = plt.subplots(figsize=(16, 16))
+#axt = tmapfig.add_axes()
 
 #absfig, (axa1, axa2, axa3) = plt.subplots(3, 2, sharex='col', sharey='row', figsize=(16, 24))
 absfig, axa1 = plt.subplots(1, 4, sharey='row', figsize=(36, 8))
@@ -126,8 +132,9 @@ flarecolours = {'A': 0.2, 'B': 0.3, 'C': 0.4, 'M': 0.5, 'X': 0.6}
 
 allars_hist = np.zeros((141, 30))
 
+print 'Beginning flares iteration'
 for flare in flares:
-  if flare['fl_goescls'] != "M6.6": continue
+  if flare['fl_goescls'] != "X2.2": continue
   try:
     flaretime = parse(flare['event_starttime'])
     starttime = flaretime-dt.timedelta(hours=0.5)
@@ -157,19 +164,17 @@ for flare in flares:
     maps_root = '/imaps/holly/home/ajl7/AR-tmaps/AR{}/'.format(flare['ar_noaanum'])
     params_dir = '/imaps/holly/home/ajl7/AR_temp_params/AR{}/'.format(flare['ar_noaanum'])
     paramvals_fname = join(params_dir, '{}__{}'.format(str(flaretime).replace(' ', 'T'), str(flare['fl_goescls']).replace('.', '_')))
-    print paramvals_fname
+    print 'Loading ', paramvals_fname
     print exists(paramvals_fname)
     
     if not exists(paramvals_fname):
-      paramvals = np.zeros((5, ntimes))
+      paramvals = np.zeros((7, ntimes))
       for t, time in enumerate(times):
         # Load/calculate temperature map data
         print time
         try:
             cname = join(data_dir, '{0:%Y/%m/%d}/171'.format(time),
                          'aia*{0:%Y?%m?%d}?{0:%H?%M?%S}*lev1?fits'.format(time))
-            print cname
-            print exists(cname)
             coordsmap = Map(cname)
             maps_dir = join(maps_root, "{:%Y/%m/%d}/temperature/".format(time))
 
@@ -177,9 +182,13 @@ for flare in flares:
             x, y = wcs.convert_hg_hpc(region['hgc_x'], region['hgc_y'],
                                       b0_deg=coordsmap.heliographic_latitude,
                                       l0_deg=coordsmap.carrington_longitude)
+            print x, y
             thismap = tmap(time, data_dir=data_dir, maps_dir=maps_dir,
                            submap=([x-ar_rad, x+ar_rad], [y-ar_rad, y+ar_rad]))
             thismap.save()
+            plt.sca(axt)
+            thismap.plot()#axes=axt)
+            plt.savefig(join(maps_dir, '{:%Y-%m-%dT%H%M}'.format(time)))
         
             """# Crop temperature map to active region
             x, y = wcs.convert_hg_hpc(region['hgc_x'], region['hgc_y'],
@@ -189,11 +198,12 @@ for flare in flares:
             data = thismap.data
             paramvals[:, t] = [np.nanmin(data), np.percentile(data, 5),
                                np.nanmean(data), np.percentile(data, 95),
-                               np.nanmax(data)]
+                               np.nanmax(data), np.std(data),
+                               np.count_nonzero(data > 6.5)]
         except:
-            raise
+            #raise
             print "Failed", time
-            paramvals[:, t] = [0, 0, 0, 0, 0]
+            paramvals[:, t] = [0, 0, 0, 0, 0, 0, 0]
             if not exists(params_dir):
                 os.makedirs(params_dir)
             np.savetxt(paramvals_fname, paramvals)
@@ -241,8 +251,10 @@ for flare in flares:
     #plt.ylim(0, 1)
     #plt.legend()"""
 
-    tempinds = [int(round((m - 5.6) * 100)) for m in means]
-    allars_hist[tempinds, times] += 1
+    print means
+    if parameter != 'n over threshold':
+        tempinds = [int(round((m - 5.6) * 100)) for m in means]
+        allars_hist[tempinds, times] += 1
 
     # Append  temperature values for final temperature map to list
     ar_temps_fltime.append(means[-1])
@@ -255,7 +267,7 @@ for flare in flares:
     flarelist.write("{} {} & {} & {} \\\\ \n".format(flaretime.date(), flaretime.time(), flare['fl_goescls'], flare['ar_noaanum']))
   except:
     print 'Failed for {} flare at {}'.format(flare['fl_goescls'], flare['event_starttime'])
-    #raise
+    raise
     continue
 
 flarelist.close()
