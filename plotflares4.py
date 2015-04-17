@@ -270,7 +270,7 @@ for flare in flares:
     print 'Flarelist file written to'
   except:
     print 'Failed for {} flare at {}'.format(flare['fl_goescls'], flare['event_starttime'])
-    raise
+    #raise
     continue
 
 flarelist.close()
