@@ -67,13 +67,13 @@ def p5(data):
     return np.percentile(data, 5)
 
 
-parameter = '5th %-ile'
+parameter = 'mean'
 functions = {'mean': np.nanmean, 'max': np.nanmax, 'min': np.nanmin, 
              '95th %-ile': p95, '5th %-ile': p5}
 savedir = "/imaps/holly/home/ajl7/tempplots_{}/".format(parameter.replace(' ', '_'))
 
 start = parse('2011-02-01')
-end = parse('2011-03-01')
+end = parse('2011-04-01')
 
 client = hek.HEKClient()
 flares = client.query(hek.attrs.Time(start, end),
@@ -152,20 +152,24 @@ for flare in flares:
     ntimes = int(timerange.seconds()/delta.total_seconds())
     times = [time.start() for time in timerange.split(ntimes)]
     
-    data_dir = '/imaps/sspfs/archive/sdo/aia/activeregions/AR{}/data/'.format(flare['ar_noaanum'])
+    data_root = '/imaps/sspfs/archive/sdo/aia/activeregions/AR{}/data/'.format(flare['ar_noaanum'])
     maps_root = '/imaps/sspfs/archive/sdo/aia/fulldisk/images/' #'/imaps/holly/home/ajl7/tempmaps'
     
     # Create empty lists to store temperature values and running differences
     # Called means because I did mean first, but used for max, percentiles,
     # etc sometimes
     means = []
-    runningdiffT = []
+    #runningdiffT = []
     for time in times:
         # Load/calculate temperature map data
         print time
         try:
+            if time not in [times[0], times[-11], times[-2], times[-1]]:
+                means.append(np.nan)
+                continue
+            data_dir = join(data_root, "{:%Y/%m/%d/}".format(time))
             maps_dir = join(maps_root, "{:%Y/%m/%d}/temperature/".format(time))
-            thismap = tmap(time, data_dir=data_dir, maps_dir=maps_dir)
+            thismap = tmap(time, data_dir=data_dir, maps_dir=maps_dir, verbose=True)
             thismap.save()
         
             # Crop temperature map to active region
@@ -176,15 +180,15 @@ for flare in flares:
 
             # Append appropriate temperature values to list
             means.append(functions[parameter](thismap.data))
-            if len(means) > 1:
-                runningdiffT.append(means[-1]-means[-2])
-            else:
-                runningdiffT.append(0)
+            #if len(means) > 1:
+            #    runningdiffT.append(means[-1]-means[-2])
+            #else:
+            #    runningdiffT.append(0)
             
         except:
-            failed = True
+            #failed = True
             print "Failed", time
-            #means.append(np.nan)
+            means.append(np.nan)
             raise
 
     #print means
@@ -198,13 +202,13 @@ for flare in flares:
     else:
         col = 1
     colourVal = scalarMap.to_rgba(flarecolours[col][flcl])
-    absdiffT = [mean-means[-1] for mean in means]
+    #absdiffT = [mean-means[-1] for mean in means]
     limits1 = (min(limits1[0], min(means)), max(limits1[1], max(means)))
-    limits2 = (min(limits2[0], min(runningdiffT)), max(limits2[1], max(runningdiffT)))
-    limits3 = (min(limits3[0], min(absdiffT)), max(limits3[1], max(absdiffT)))
+    #limits2 = (min(limits2[0], min(runningdiffT)), max(limits2[1], max(runningdiffT)))
+    #limits3 = (min(limits3[0], min(absdiffT)), max(limits3[1], max(absdiffT)))
     axa1[col].plot(times, means, color=colourVal)
-    axa2[col].plot(times, runningdiffT, color=colourVal)
-    axa3[col].plot(times, absdiffT, color=colourVal) # Absolute difference
+    #axa2[col].plot(times, runningdiffT, color=colourVal)
+    #axa3[col].plot(times, absdiffT, color=colourVal) # Absolute difference
     #ax3[col].plot(times, [((mean-means[-1])/means[-1])*100 for mean in means], color=colorVal) # Percentage difference
 
     """# Plot ratio of temperatures to given temperature over time
@@ -234,11 +238,11 @@ flarelist.close()
 
 axa1[0].set_ylim(limits1[0]-0.02, limits1[1]+0.02)
 axa1[1].set_ylim(limits1[0]-0.02, limits1[1]+0.02)
-axa2[0].set_ylim(limits2[0]-0.005, limits2[1]+0.005)
+"""axa2[0].set_ylim(limits2[0]-0.005, limits2[1]+0.005)
 axa2[1].set_ylim(limits2[0]-0.005, limits2[1]+0.005)
 axa3[0].set_ylim(limits3[0]-0.005, limits3[1]+0.005)
-axa3[1].set_ylim(limits3[0]-0.005, limits3[1]+0.005)
-absfig.savefig(join(savedir, "allars"))
+axa3[1].set_ylim(limits3[0]-0.005, limits3[1]+0.005)"""
+absfig.savefig(join(savedir, "oldallars"))#"allars"))
 #ratfig.savefig(join(savedir, "tempratios"))
 plt.close('all')
 
@@ -248,7 +252,7 @@ flarecolours = {'A': 0.2, 'B': 0.35, 'C': 0.5, 'M': 0.65, 'X': 0.8}
 # Plot instantaneous temperatures of active regions for all flares against flare class
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, sharex='col', sharey='row', figsize=(18, 18))
 ax1.set_title("30 minutes before flare")
-ax1.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
+#ax1.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
 ax1.axhline(-7, color=scalarMap.to_rgba(flarecolours['B']), linestyle='--')
 ax1.axhline(-6, color=scalarMap.to_rgba(flarecolours['C']), linestyle='--')
 ax1.axhline(-5, color=scalarMap.to_rgba(flarecolours['M']), linestyle='--')
@@ -257,7 +261,7 @@ ax1.scatter(ar_temps_30, fl_classes)
 ax1.set_ylabel("log(flux)")
 limits = (min(limits[0], min(ar_temps_30)), max(limits[1], max(ar_temps_30)))
 ax2.set_title("10 minutes before flare")
-ax2.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
+#ax2.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
 ax2.axhline(-7, color=scalarMap.to_rgba(flarecolours['B']), linestyle='--')
 ax2.axhline(-6, color=scalarMap.to_rgba(flarecolours['C']), linestyle='--')
 ax2.axhline(-5, color=scalarMap.to_rgba(flarecolours['M']), linestyle='--')
@@ -274,7 +278,7 @@ for i in range(len(ar_temps_30)):
 ax2.scatter(ar_temps_10, fl_classes)
 limits = (min(limits[0], min(ar_temps_10)), max(limits[1], max(ar_temps_10)))
 ax3.set_title("1 minute before flare")
-ax3.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
+#ax3.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
 ax3.axhline(-7, color=scalarMap.to_rgba(flarecolours['B']), linestyle='--')
 ax3.axhline(-6, color=scalarMap.to_rgba(flarecolours['C']), linestyle='--')
 ax3.axhline(-5, color=scalarMap.to_rgba(flarecolours['M']), linestyle='--')
@@ -292,7 +296,7 @@ limits = (min(limits[0], min(ar_temps_1)), max(limits[1], max(ar_temps_1)))
 ax3.set_ylabel("log(flux)")
 ax3.set_xlabel("{} temperature of active region".format(parameter.title()))
 ax4.set_title("At time of flare")
-ax4.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
+#ax4.axhline(-8, color=scalarMap.to_rgba(flarecolours['A']), linestyle='--')
 ax4.axhline(-7, color=scalarMap.to_rgba(flarecolours['B']), linestyle='--')
 ax4.axhline(-6, color=scalarMap.to_rgba(flarecolours['C']), linestyle='--')
 ax4.axhline(-5, color=scalarMap.to_rgba(flarecolours['M']), linestyle='--')
@@ -313,7 +317,7 @@ for axis in [ax1, ax2, ax3, ax4]:
 plt.savefig(join(savedir, "allflares"))
 plt.close()
 
-limits = (1000, -1000)
+"""limits = (1000, -1000)
 # Plot temperature differences of active regions for all flares against flare class
 fig, (ax1, ax2, ax3) = plt.subplots(1, 3, sharex='col', sharey='row', figsize=(24, 8))
 ax1.set_title("T(t=30) - T(t=0)")
@@ -354,3 +358,4 @@ for axis in [ax1, ax2, ax3]:
 
 plt.savefig(join(savedir, "allflares_diffs"))
 plt.close()
+"""

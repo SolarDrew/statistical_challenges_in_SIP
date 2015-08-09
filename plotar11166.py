@@ -5,8 +5,9 @@ Created on Tue Dec 09 18:15:45 2014
 @author: Drew Leonard
 """
 
-from matplotlib import use
+from matplotlib import use, rc
 use('agg')
+rc('savefig', bbox='tight', pad_inches=0.5)
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cmx
@@ -67,10 +68,10 @@ def flareclass_to_flux(flareclass):
 density = None#'211'
 
 parameter = 'all'#'min'
-allpars = ['min', '5th %-ile', '10th %-ile', 'mean', '90th %-ile', '95th %-ile', 'max', 'stdev',
+allpars = ['min', '5th %-ile', '10th %-ile', 'mean', 'stddev', '90th %-ile', '95th %-ile', 'max',
            'n over 6.1', 'n over 6.3', 'n over 6.5']
 if parameter == 'all':
-    pars = allpars[:7]
+    pars = allpars[:8]
 else:
     pars = [parameter]
 
@@ -117,7 +118,7 @@ absfig.suptitle(parameter)
 for ax, times in zip(axa1, windows):
     for t in times:
         print str(t)
-    tmapfig, axt = plt.subplots(figsize=(16, 16))
+    tmapfig = plt.figure('tmaps', figsize=(32, 24))
     ntimes = len(times)
     thisendtime = times[-1]
     try:
@@ -143,6 +144,7 @@ for ax, times in zip(axa1, windows):
                                           b0_deg=thismap.heliographic_latitude,
                                           l0_deg=thismap.carrington_longitude)
                 print x, y
+                largemap = thismap.submap([x-200, x+200], [y-200, y+200])
                 thismap = thismap.submap([x-ar_rad, x+ar_rad], [y-ar_rad, y+ar_rad])
 
                 if density:
@@ -151,17 +153,19 @@ for ax, times in zip(axa1, windows):
                 #x, y = flare['xpos'], flare['ypos']
                 #largemap = thismap.submap([x-200, x+200], [y-200, y+200])
                 #thismap = thismap.submap([x-ar_rad, x+ar_rad], [y-ar_rad, y+ar_rad])
-                plt.sca(axt)
-                plt.cla()
-                """if density:
+                plt.figure('tmaps')
+                plt.clf()
+                axt = tmapfig.add_subplot(111)
+                if density:
                     largemap.plot(vmin=np.nanmean(largemap.data) - (2*(np.nanstd(largemap.data))),
                                   vmax=np.nanmean(largemap.data) + (2*(np.nanstd(largemap.data))))
                 else:
                     largemap.plot()
+                    plt.colorbar()
                 rect = patches.Rectangle([x-ar_rad, y-ar_rad], ar_rad*2, ar_rad*2, color='white',
                                          fill=False)
-                axt.add_artist(rect)"""
-                thismap.plot()
+                axt.add_artist(rect)
+                #thismap.plot()
                 plt.title('Max: {:.2f}, Mean: {:.2f}, Min: {:.2f}'.format(thismap.max(), thismap.mean(), thismap.min()))
                 output_dir = join('/imaps/holly/home/ajl7/AR-tmaps/AR11166_b/{:%Y/%m/%d}'.format(time))
                 if density:
@@ -175,10 +179,10 @@ for ax, times in zip(axa1, windows):
                                    np.percentile(data, 5),
                                    np.percentile(data, 10),
                                    np.nanmean(data),
+                                   np.std(data),
                                    np.percentile(data, 90),
                                    np.percentile(data, 95),
                                    np.nanmax(data),
-                                   np.std(data),
                                    np.count_nonzero(data > 6.1),
                                    np.count_nonzero(data > 6.3),
                                    np.count_nonzero(data > 6.5)]
@@ -192,6 +196,8 @@ for ax, times in zip(axa1, windows):
           paramvals = np.loadtxt(paramvals_fname)
     
         for par in pars:
+            if par == 'stddev':
+                continue
             # Rename a thing so I don't have to change a load of code.
             # I'm a bad man
             parind = allpars.index(par)
@@ -203,7 +209,10 @@ for ax, times in zip(axa1, windows):
             times2 = [(ti - thisendtime).total_seconds()/60 for ti in times]
             # Set current axis and plot
             plt.sca(ax)
-            plt.plot(times2, means)
+            if par == 'mean':
+                plt.errorbar(times2, means, yerr=paramvals[parind+1, :])
+            else:
+                plt.plot(times2, means)
         print times[0], times[-1]
         print times2
     except:
@@ -211,7 +220,7 @@ for ax, times in zip(axa1, windows):
         raise
 
     print 'plot 1'
-    plt.ylim(5.9, 6.7)
+    plt.ylim(5.9, 6.2)
 
 absfig.savefig(join(savedir, "ar11166"))
 plt.close('all')
