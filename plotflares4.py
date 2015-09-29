@@ -92,18 +92,28 @@ ar_temps_10 = []
 ar_temps_30 = []
 fl_classes = []
 
-flarelist = open(join(savedir, "flarelist.txt"), "w")
+flarelist = open(join(savedir, "dTdt.txt"), "w")
+preamble = """\\begin{tabular}{c|c|c|c|c}
+Date and time & $\\langle \\frac{\\Delta T_{5th}}{\\Delta t} \\rangle$ & $\\langle \\frac{\\Delta T_{mean}}{\\Delta t} \\rangle$ & $\\langle \\frac{\\Delta T_{95th}}{\\Delta t} \\rangle$ \\\\
+\hline\n"""
+flarelist.write(preamble)
 
 tmapfig = plt.figure("tmaps", figsize=(32, 24))
 
-absfig, axa1 = plt.subplots(4, 6, figsize=(32, 16))
-axa1 = axa1.flatten()
+figs, axa1 = [], []
+for i in range(4):
+    thisfig, thisax = plt.subplots(3, 2, figsize=(16, 24))
+    figs.append(thisfig)
+    axa1 += list(thisax.flatten())
+print len(figs), len(axa1)
+#absfig, axa1 = plt.subplots(4, 6, figsize=(32, 16))
+#axa1 = axa1.flatten()
 #axa1.set_ylabel('{} log(T)'.format(parameter.title()))
 limits1 = (1000, -1000)
 limits2 = (1000, -1000)
 limits3 = (1000, -1000)
 
-absfig.suptitle(parameter)
+#absfig.suptitle(parameter)
 
 # Set up some colourmap stuff for line-plotting later
 cmap = cm = plt.get_cmap('afmhot')
@@ -112,9 +122,10 @@ scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cmap)
 flarecolours = {'A': 0.2, 'B': 0.3, 'C': 0.4, 'M': 0.5, 'X': 0.6}
 
 #allars_hist = np.zeros((141, 30))
-dTdt = []
+dTdt = np.zeros(shape=(3, len(flarefiles)-4))
 
-for f, file in enumerate(flarefiles):
+f = 0
+for file in flarefiles[:-2]:
   flare = readsav(file)['dnow'][0]
   #keys = flare.dtype.fields.keys()
   #keys.sort()
@@ -162,9 +173,19 @@ for f, file in enumerate(flarefiles):
              if isinstance(coordsmap, list): coordsmap = coordsmap[0]
             except:
              print cname, exists(cname)
-             raise"""
-            maps_dir = join(maps_root, "{:%Y/%m/%d}/temperature/".format(time))
+             raise
+            cfig, cax = plt.subplots(figsize=(16, 16))
+            coordsmap.plot()
+            rect = patches.Rectangle([x-ar_rad, y-ar_rad], ar_rad*2, ar_rad*2, color='blue',
+                                     fill=False)
+            cax.add_artist(rect)
+            output_dir = join('/imaps/holly/home/ajl7/AR-tmaps/',
+                              basename(flaredir), '{:%Y/%m/%d}'.format(time))
+            cname = '{}/{:%Y-%m-%dT%H%M}_fulldisk'.format(output_dir, time)
+            plt.savefig(cname)
+            plt.close()"""
 
+            maps_dir = join(maps_root, "{:%Y/%m/%d}/temperature/".format(time))
             thismap = tmap(time, data_dir=data_dir, maps_dir=maps_dir)#, verbose=True)#,
             #               submap=([x-ar_rad, x+ar_rad], [y-ar_rad, y+ar_rad]))
             thismap.save()
@@ -226,7 +247,8 @@ for f, file in enumerate(flarefiles):
     else:
       paramvals = np.loadtxt(paramvals_fname)
 
-    for par in pars:
+    p1 = 0
+    for p, par in enumerate(pars):
         # Rename a thing so I don't have to change a load of code.
         # I'm a bad man
         parind = allpars.index(par)
@@ -259,6 +281,9 @@ for f, file in enumerate(flarefiles):
             plt.errorbar(times2, means, yerr=paramvals[parind+1, :])
         else:
             plt.plot(times2, means)#, color=colourVal)
+        plt.title(flaretime)
+        plt.xlabel('Time before flare')
+        plt.ylabel('log(T)')
 
         """if parameter != 'n over threshold':
             tempinds = [int(round((m - 5.6) * 100)) for m in means]
@@ -274,34 +299,60 @@ for f, file in enumerate(flarefiles):
         #fl_classes.append(np.log10(flareclass_to_flux(str(flare['fl_goescls'])).value))
         #print 'Lists kerfuffled'
 
-    if 0 not in paramvals[7]:
-        maxtemps = paramvals[7]
-        # Change in log(T) per minute
-        dTdt.append(abs(maxtemps[1:] - maxtemps[:-1]).mean()/2.0)
+        if 0 not in paramvals[p] and par in ['5th %-ile', 'mean', '95th %-ile']:
+            maxtemps = paramvals[p]
+            # Change in log(T) per minute
+            dTdt[p1, f] = abs((maxtemps[1:] - maxtemps[:-1])/2.0).mean()
+            p1 += 1
 
-    flarelist.write("{} {} & {} & {} \\\\ \n".format(flaretime.date(), flaretime.time(), 0, 0))#flare['fl_goescls'], flare['ar_noaanum']))
-    print 'Flarelist file written to'
+    values = ''.join([' & ${:e} }}$'.format(thispar) for thispar in dTdt[:, f]]).replace('e', '\\times 10^{')
+    flarelist.write("{} {}{} \\\\ \n".format(flaretime.date(), flaretime.time(), values))#flare['fl_goescls'], flare['ar_noaanum']))
+    #print 'Flarelist file written to'
+    f += 1
   except:
     print 'Failed for {} flare at {}'.format(flare, parse(flare['starttai']))
-    #raise
+    raise
     continue
 
+values = ''.join([' & ${:e} }}$'.format(thispar) for thispar in dTdt.mean(axis=1)]).replace('e', '\\times 10^{')
+flarelist.write("\hline \nAvg over all regions{}\\\\ \n".format(values))
+flarelist.write("\\end{tabular}")
 flarelist.close()
+
 
 print 'plot 1'
 
 #axa1.set_ylim(limits1[0]-0.02, limits1[1]+0.02)
 for p in axa1:
+    p.set_ylim(5.6, 6.8)
+for i in range(4):
+    figs[i].savefig(join(savedir, "allars_{}".format(i)))
+for p in axa1:
     p.set_ylim(5.9, 6.2)
-absfig.savefig(join(savedir, "allars_close"))
+for i in range(4):
+    figs[i].savefig(join(savedir, "allars_close_{}".format(i)))
+#absfig.savefig(join(savedir, "allars_close_{}"))
 plt.close('all')
 
 print 'plot 2'
 
-fig = plt.figure(figsize=(32, 24))
-plt.hist(dTdt, range=(0, 0.01))
-plt.savefig('dTdt')
-plt.close()
+quiet = np.load('quiet.npy')
+colours = [' ', 'orange', 'darkorange', 'red']
+
+for p, par in enumerate(['5th', 'mean', '95th']):
+    fig = plt.figure(figsize=(16, 12))
+    plt.bar(range(len(dTdt[p])), dTdt[p])
+    meanval = quiet.mean(axis=1)[p]
+    plt.axhline(meanval, linestyle='--', label='Mean', color='yellow')
+    for nsigs in range(1, 4):
+        plussig = meanval + (dTdt.std(axis=1)[p]*nsigs)
+        label = 'Mean + ${0}\sigma$ (${1:.1%}$%)'.format(nsigs, np.count_nonzero(dTdt[p]>plussig)/float(len(dTdt[p])))
+        plt.axhline(plussig, linestyle='--', label=label, color=colours[nsigs])
+    plt.ylabel('$\\langle \\frac{\Delta T}{\Delta t} \\rangle$')
+    plt.legend()
+    plt.xlim(0, 22)
+    plt.savefig('dTdt-{}'.format(par))
+    plt.close()
 
 fig = plt.figure(figsize=(32, 24))
 """plt.imshow(allars_hist[int(round((limits1[0]-5.6)*100)):int(round((limits1[1]-5.6)*100))+1, :],
