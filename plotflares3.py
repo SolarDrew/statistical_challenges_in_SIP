@@ -6,7 +6,7 @@ Created on Tue Dec 09 18:15:45 2014
 """
 
 from matplotlib import use
-use('agg')
+use('pdf')
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cmx
@@ -16,10 +16,10 @@ from sunpy.net import hek
 from sunpy.time import parse_time as parse
 from sunpy.time.timerange import TimeRange as tr
 import datetime as dt
-from os.path import join
+from os.path import join, expanduser
 import sys
 from sys import path
-path.append('/imaps/holly/home/ajl7/CoronaTemps/')
+path.append(expanduser(join('~', 'CoronaTemps')))
 from temperature import TemperatureMap as tmap
 from astropy import units
 
@@ -66,14 +66,15 @@ def p95(data):
 def p5(data):
     return np.percentile(data, 5)
 
+fastdata = join('/fastdata', 'sm1ajl', 'thesis')
 
 parameter = 'mean'
 functions = {'mean': np.nanmean, 'max': np.nanmax, 'min': np.nanmin, 
              '95th %-ile': p95, '5th %-ile': p5}
-savedir = "/imaps/holly/home/ajl7/tempplots_{}/".format(parameter.replace(' ', '_'))
+savedir = join(fastdata, 'plots', 'chapter6', 'all_classes', '{}'.format(parameter.replace(' ', '_')))
 
 start = parse('2011-02-01')
-end = parse('2011-04-01')
+end = parse('2011-02-03')
 
 client = hek.HEKClient()
 flares = client.query(hek.attrs.Time(start, end),
@@ -152,8 +153,8 @@ for flare in flares:
     ntimes = int(timerange.seconds()/delta.total_seconds())
     times = [time.start() for time in timerange.split(ntimes)]
     
-    data_root = '/imaps/sspfs/archive/sdo/aia/activeregions/AR{}/data/'.format(flare['ar_noaanum'])
-    maps_root = '/imaps/sspfs/archive/sdo/aia/fulldisk/images/' #'/imaps/holly/home/ajl7/tempmaps'
+    data_root = join(fastdata, 'data')
+    maps_root = join(fastdata, 'maps')
     
     # Create empty lists to store temperature values and running differences
     # Called means because I did mean first, but used for max, percentiles,
@@ -242,7 +243,7 @@ axa1[1].set_ylim(limits1[0]-0.02, limits1[1]+0.02)
 axa2[1].set_ylim(limits2[0]-0.005, limits2[1]+0.005)
 axa3[0].set_ylim(limits3[0]-0.005, limits3[1]+0.005)
 axa3[1].set_ylim(limits3[0]-0.005, limits3[1]+0.005)"""
-absfig.savefig(join(savedir, "oldallars"))#"allars"))
+absfig.savefig(join(savedir, "allars"))#"oldallars"))
 #ratfig.savefig(join(savedir, "tempratios"))
 plt.close('all')
 
