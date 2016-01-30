@@ -74,7 +74,7 @@ functions = {'mean': np.nanmean, 'max': np.nanmax, 'min': np.nanmin,
 savedir = join(fastdata, 'plots', 'chapter6', 'all_classes', '{}'.format(parameter.replace(' ', '_')))
 
 start = parse('2011-02-01')
-end = parse('2011-02-03')
+end = parse('2011-04-01')
 
 client = hek.HEKClient()
 flares = client.query(hek.attrs.Time(start, end),
@@ -82,7 +82,6 @@ flares = client.query(hek.attrs.Time(start, end),
 
 flares = [fl for fl in flares if (fl['ar_noaanum'] > 11137 and 
                                   fl['ar_noaanum'] < 11184)]
-
 ar_rad = 75
 ar_temps_fltime = []
 ar_temps_1 = []
@@ -169,7 +168,7 @@ for flare in flares:
                 means.append(np.nan)
                 continue
             data_dir = join(data_root, "{:%Y/%m/%d/}".format(time))
-            maps_dir = join(maps_root, "{:%Y/%m/%d}/temperature/".format(time))
+            maps_dir = join(maps_root, "{:%Y/%m/%d/}".format(time))
             thismap = tmap(time, data_dir=data_dir, maps_dir=maps_dir, verbose=True)
             thismap.save()
         
