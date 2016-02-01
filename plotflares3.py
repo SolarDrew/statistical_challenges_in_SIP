@@ -169,7 +169,7 @@ for flare in flares:
                 continue
             data_dir = join(data_root, "{:%Y/%m/%d/}".format(time))
             maps_dir = join(maps_root, "{:%Y/%m/%d/}".format(time))
-            thismap = tmap(time, data_dir=data_dir, maps_dir=maps_dir, verbose=True)
+            thismap = tmap(time, data_dir=data_dir, maps_dir=maps_dir)#, verbose=True)
             thismap.save()
         
             # Crop temperature map to active region
