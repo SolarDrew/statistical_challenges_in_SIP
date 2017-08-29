@@ -1,0 +1,19 @@
+#$ -S /bin/sh
+#$ -cwd
+#$ -q large.q
+#$ -l mem=8G
+#$ -l rmem=8G
+# #$ -N flares_allclasses
+#$ -N flares_xflares
+
+module load /apps/python/conda/
+module load /mpi/gcc/openmpi/1.10.0
+source activate thesis
+cd ~/thesis_plots/statistical_challenges_in_SIP/
+
+#rm parpy*
+
+#python plotflares3.py 1>> parpyout-all 2>> parpyerr-all
+python plotflares4.py 1>> parpyout-x 2>> parpyerr-x
+
+rm flares_allclasses.*

@@ -6,7 +6,7 @@ Created on Tue Dec 09 18:15:45 2014
 """
 
 from matplotlib import use, rc
-use('agg')
+use('pdf')
 rc('savefig', bbox='tight', pad_inches=0.5)
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,7 +23,7 @@ import os
 from os.path import join, exists, dirname, basename
 import sys
 from sys import path, argv
-path.append('/imaps/holly/home/ajl7/CoronaTemps/')
+path.append('/home/sm1ajl/CoronaTemps/')
 from temperature import TemperatureMap as tmap
 from astropy import units
 import glob
@@ -76,14 +76,23 @@ if parameter == 'all':
 else:
     pars = [parameter]
 
-savedir = "/imaps/holly/home/ajl7/tempplots/{}/".format(parameter.replace(' ', '_').replace('.', '_'))
+savedir = "/fastdata/sm1ajl/thesis/plots/chapter6/x_class/temperature/{}/".format(parameter.replace(' ', '_').replace('.', '_'))
+print exists(savedir)
 if density:
-    savedir = savedir.replace('tempplots', 'densplots_{}'.format(density))
+    savedir = savedir.replace('temperature', 'density_{}'.format(density))
 if not exists(savedir):
     os.makedirs(savedir)
 
-flarefiles = glob.glob('/imaps/sspfs/archive/sdo/aia/flares/*/*.dat')
-print len(flarefiles)
+#flarefiles = glob.glob('/imaps/sspfs/archive/sdo/aia/flares/*/*.dat')
+#print len(flarefiles)
+start = parse('2010-07-14')
+end = parse('2011-09-19')
+
+client = hek.HEKClient()
+allflares = client.query(hek.attrs.Time(start, end),
+                         hek.attrs.EventType('FL'))
+allflares = [fl for fl in allflares if (fl['fl_goescls'] != "" and fl['fl_goescls'][0] == 'X')]
+print len(allflares)
 
 ar_rad = 75
 ar_temps_fltime = []
@@ -122,11 +131,12 @@ scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cmap)
 flarecolours = {'A': 0.2, 'B': 0.3, 'C': 0.4, 'M': 0.5, 'X': 0.6}
 
 #allars_hist = np.zeros((141, 30))
-dTdt = np.zeros(shape=(3, len(flarefiles)-4))
+dTdt = np.zeros(shape=(3, len(allflares)))#len(flarefiles)-4))
 
 f = 0
-for file in flarefiles[:-2]:
-  flare = readsav(file)['dnow'][0]
+#for file in flarefiles[:-2]:
+#  flare = readsav(file)['dnow'][0]
+for flare in allflares:
   #keys = flare.dtype.fields.keys()
   #keys.sort()
   #for x in keys[:12]:
@@ -312,7 +322,7 @@ for file in flarefiles[:-2]:
   except:
     print 'Failed for {} flare at {}'.format(flare, parse(flare['starttai']))
     raise
-    continue
+    #continue
 
 values = ''.join([' & ${:e} }}$'.format(thispar) for thispar in dTdt.mean(axis=1)]).replace('e', '\\times 10^{')
 flarelist.write("\hline \nAvg over all regions{}\\\\ \n".format(values))
